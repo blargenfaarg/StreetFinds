@@ -35,8 +35,7 @@ class UserPage : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    UserGreeting("StreetFinders")
-                    OnboardingScreen()
+                    UserGreeting()
                 }
             }
         }
@@ -63,7 +62,7 @@ class UserPage : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun UserGreeting(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
+fun UserGreeting(modifier: Modifier = Modifier.fillMaxSize()) {
     Surface(color = Color.Red, modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -72,15 +71,13 @@ fun UserGreeting(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
             Text(
                 modifier = Modifier.fillMaxHeight(),
 
-                text = "Hello $name!",
+                text = "~IN DEVELOPMENT~",
                 color = Color.Black,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 35.sp,
             )
         }
-
-
     }
 }
 @RequiresApi(Build.VERSION_CODES.O)
@@ -88,6 +85,6 @@ fun UserGreeting(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
 @Composable
 fun UserGreetingPreview() {
     SprintOneTheme {
-        UserGreeting("StreetFinders")
+        UserGreeting()
     }
 }
