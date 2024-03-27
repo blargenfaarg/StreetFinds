@@ -56,9 +56,6 @@ fun List(name: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.verticalScroll(state)
         ) {
-            var x = 0
-            while (x < 5) {
-
                 Card(
                     modifier = Modifier.padding(10.dp)
                 ) {
@@ -88,8 +85,6 @@ fun List(name: String) {
                         color = Color.Black,
                     )
                 }
-                x++
-            }
         }
     }
 }

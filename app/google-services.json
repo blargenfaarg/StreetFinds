@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138121472091",
+    "project_id": "streetfinds-d2669",
+    "storage_bucket": "streetfinds-d2669.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138121472091:android:090baf40d5f161ab4fb77e",
+        "android_client_info": {
+          "package_name": "com.example.sprintone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZ9jKS16ZfQe1c3JMCj7Jv57CiH9DhAT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

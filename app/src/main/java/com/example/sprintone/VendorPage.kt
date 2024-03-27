@@ -30,9 +30,6 @@ import com.example.sprintone.ui.theme.SprintOneTheme
 class VendorPage : AppCompatActivity() {
 
     //private lateinit var binding: ActivityVendorPage2Binding
-
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +45,7 @@ class VendorPage : AppCompatActivity() {
             }
         }
     }
+
     /*
     binding = ActivityUserPageBinding.inflate(layoutInflater)
     setContentView(binding.root)
@@ -88,13 +86,5 @@ fun VendorGreeting(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
         }
 
 
-    }
-}
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun VendorGreetingPreview() {
-    SprintOneTheme {
-        VendorGreeting("Vendors!!")
     }
 }
