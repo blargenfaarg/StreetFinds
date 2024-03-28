@@ -30,8 +30,12 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+
 
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
+                    val db = Firebase.firestore
                     OnboardingScreen()
                 }
             }
@@ -60,7 +65,7 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
         Column (modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            SearchBarProtoComida()
+            LoadSearchBar()
             Text("StreetFinds",
                 modifier = Modifier.fillMaxHeight(),
                 textAlign = TextAlign.Center,
@@ -118,13 +123,3 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
             }
         }
     }
-
-@RequiresApi(Build.VERSION_CODES.O)
-//@Preview(showBackground = true, widthDp = 320, heightDp = 320, uiMode = Configuration.UI_MODE_NIGHT_YES)
-//@Preview(showBackground = true, widthDp = 320, heightDp = 320)
-@Composable
-fun OnboardingPreview() {
-    SprintOneTheme {
-        OnboardingScreen()
-    }
-}
