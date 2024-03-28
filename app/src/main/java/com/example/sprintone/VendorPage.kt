@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,13 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.example.sprintone.databinding.ActivityVendorPage2Binding
 import com.example.sprintone.ui.theme.SprintOneTheme
 
 class VendorPage : AppCompatActivity() {
@@ -40,7 +33,7 @@ class VendorPage : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    VendorGreeting("StreetFinders")
+                    LoadVendorPage("StreetFinders")
                 }
             }
         }
@@ -68,7 +61,7 @@ class VendorPage : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun VendorGreeting(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
+fun LoadVendorPage(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
     Surface(color = Color.Red, modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,

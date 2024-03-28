@@ -7,7 +7,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,12 +47,12 @@ class ListActivity : AppCompatActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun List(name: String) {
-    val state = rememberScrollState()
+    val scrollState = rememberScrollState()
     Surface(color = Color.Red, modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.verticalScroll(state)
+            modifier = Modifier.verticalScroll(scrollState)
         ) {
                 Card(
                     modifier = Modifier.padding(10.dp)

@@ -1,10 +1,8 @@
 package com.example.sprintone
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.GeoPoint
 
 
 class MainActivity : ComponentActivity() {
@@ -50,23 +47,6 @@ class MainActivity : ComponentActivity() {
                     color = Color.Red
                 ) {
                     val db = Firebase.firestore
-
-
-                    // Create a new truck with name, type of food, and lat/long location
-                    val truck = hashMapOf(
-                        "Name" to "Don Julio's Tacos",
-                        "Description" to "A family-owned business specializing in the tastiest foods",
-                        "Type" to "Mexican",
-                        "Location" to "1 University Dr, Camarillo, CA 93012"
-                    )
-
-                    db.collection("trucks").add(truck)
-                        .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w(TAG, "Error adding document", e)
-                        }
                     OnboardingScreen()
                 }
             }
@@ -85,7 +65,7 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
         Column (modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            SearchBarProtoComida()
+            LoadSearchBar()
             Text("StreetFinds",
                 modifier = Modifier.fillMaxHeight(),
                 textAlign = TextAlign.Center,
