@@ -35,6 +35,7 @@ import com.google.firebase.firestore.firestore
 
 
 class MainActivity : ComponentActivity() {
+    val db = Firebase.firestore
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    val db = Firebase.firestore
                     OnboardingScreen()
                 }
             }

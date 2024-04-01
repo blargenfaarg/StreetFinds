@@ -7,22 +7,24 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 class VendorPage : AppCompatActivity() {
-
-    //private lateinit var binding: ActivityVendorPage2Binding
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,51 +35,68 @@ class VendorPage : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    LoadVendorPage("StreetFinders")
+                    LoadVendorPage()
                 }
             }
         }
     }
-
-    /*
-    binding = ActivityUserPageBinding.inflate(layoutInflater)
-    setContentView(binding.root)
-
-    val navView: BottomNavigationView = binding.navView
-
-    val navController = findNavController(R.id.nav_host_fragment_activity_user_page)
-    // Passing each menu ID as a set of Ids because each
-    // menu should be considered as top level destinations.
-    val appBarConfiguration = AppBarConfiguration(
-        setOf(
-            R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-        )
-    )
-    setupActionBarWithNavController(navController, appBarConfiguration)
-    navView.setupWithNavController(navController)
-
-     */
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LoadVendorPage(name: String, modifier: Modifier = Modifier.fillMaxSize()) {
-    Surface(color = Color.Red, modifier = Modifier.fillMaxSize()) {
+fun LoadVendorPage()
+{
+    var truckName by remember { mutableStateOf("") }
+    var truckDescription by remember { mutableStateOf("") }
+    var truckType by remember { mutableStateOf("") }
+    var truckLocation by remember { mutableStateOf("") }
+
+    val db = Firebase.firestore
+
+    Surface(color = Color.White, modifier = Modifier.fillMaxSize())
+    {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                modifier = Modifier.fillMaxHeight(),
-
-                text = "Hello $name!",
-                color = Color.Black,
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 35.sp,
+            OutlinedTextField(
+                value = truckName,
+                onValueChange = { truckName = it },
+                label = { Text("Name") }
             )
+            OutlinedTextField(
+                value = truckDescription,
+                onValueChange = { truckDescription = it },
+                label = { Text("Description") }
+            )
+            OutlinedTextField(
+                value = truckType,
+                onValueChange = { truckType = it },
+                label = { Text("Type") }
+            )
+            OutlinedTextField(
+                value = truckLocation,
+                onValueChange = { truckLocation = it },
+                label = { Text("Location") }
+            )
+
+            Button(
+                onClick = {
+                    val truck = hashMapOf(
+                        "Name" to truckName,
+                        "Type" to truckType,
+                        "Location" to truckLocation,
+                        "Description" to truckDescription
+                    )
+                    db.collection("trucks").add(truck)
+                },
+                enabled = truckName.isNotBlank()
+                        && truckDescription.isNotBlank()
+                        && truckType.isNotBlank()
+                        && truckLocation.isNotBlank()
+            ) {
+                Text("Add Truck")
+            }
         }
-
-
     }
 }
