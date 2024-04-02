@@ -47,40 +47,46 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    OnboardingScreen()
+                    LoadMainScreen()
                 }
             }
         }
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier) {
+fun LoadMainScreen(modifier: Modifier = Modifier) {
     val mContext = LocalContext.current
 
     Surface(color = Color.Red,
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)){
-        Column (modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             LoadSearchBar()
-            Text("StreetFinds",
+            Text(
+                "StreetFinds",
                 modifier = Modifier.fillMaxHeight(),
                 textAlign = TextAlign.Center,
                 fontSize = 62.sp,
                 color = Color.White,
-                fontWeight = FontWeight.ExtraBold)
-            }
+                fontWeight = FontWeight.ExtraBold
+            )
         }
+    }
+
         Row(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier
+                .fillMaxSize()
                 .padding(10.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         )  {
-
+            //LoadBottomBar()
             Button(
                 modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -122,4 +128,8 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
                 Text("Users", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = TextUnit(0.9F, TextUnitType.Sp))
             }
         }
-    }
+}
+
+
+
+

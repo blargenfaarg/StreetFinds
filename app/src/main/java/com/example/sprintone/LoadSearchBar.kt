@@ -63,15 +63,13 @@ fun LoadSearchBar() {
                 searchHistory.filter { it.contains(query, true) }
             filteredPlaces.forEach { name ->
                 Text(
-                    text = "$name",
+                    text = name,
                     modifier = Modifier
                         .padding(16.dp)
                         .clickable { println("Info: $name") }
                 )
             }
         }
-
-
     }
 }
 

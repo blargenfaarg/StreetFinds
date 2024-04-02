@@ -109,9 +109,14 @@ fun DisplayList() {
                     Text(
                         text = truck.type,
                         textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(10.dp)
                     )
                     Text(
-                        text = truck.location
+                        text = truck.location,
+                        modifier = Modifier
+                            .padding(10.dp)
+
                     )
                     Text(
                         modifier = Modifier
