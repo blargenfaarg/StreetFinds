@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.example.sprintone.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
@@ -26,22 +27,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
-
         mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        //getPinLocation()
 
         val geocode = Geocoder(this, Locale.getDefault())
-
         val db = Firebase.firestore
+
         try {
             db.collection("trucks")
                 .get()
@@ -59,6 +57,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     .position(pin)
                                     .title("Marker")
                             )
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pin, 12.0f)) // Adjust zoom level as needed
 
                         } else {
                             println("Location not found for document ${document.id}")
@@ -67,6 +66,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
         } catch (e: Exception) {
             Log.e(ContentValues.TAG, "Error getting documents: ", e)
-        }
+       }
     }
 }
