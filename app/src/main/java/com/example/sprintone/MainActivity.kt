@@ -86,12 +86,11 @@ fun LoadMainScreen(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         )  {
-            //LoadBottomBar()
             Button(
                 modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 onClick =  {
-                    mContext.startActivity(Intent(mContext, MapsActivity::class.java))
+                    mContext.startActivity(Intent(mContext, MapsComposeActivity::class.java))
                 },
             )
             {
