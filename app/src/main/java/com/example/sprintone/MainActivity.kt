@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    LoadMainScreen()
+                   // LoadMainScreen()
                 }
             }
         }
@@ -55,6 +55,8 @@ class MainActivity : ComponentActivity() {
 }
 
 
+
+/*
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
@@ -129,6 +131,7 @@ fun LoadMainScreen(modifier: Modifier = Modifier) {
         }
 }
 
+ */
 
 
 

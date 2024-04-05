@@ -2,7 +2,9 @@ package com.example.sprintone
 
 import android.content.Intent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -21,19 +23,19 @@ fun LoadNavBar() {
 
     NavigationBar {
             NavigationBarItem(
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = "test") },
+                icon = { Icon(Icons.Filled.Place, contentDescription = "test") },
                 label = { Text("Map") },
                 selected = false,
                 onClick = { context.startActivity(Intent(context, MapsComposeActivity::class.java)) }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = "test") },
+                icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "test") },
                 label = { Text("List") },
                 selected = false,
                 onClick = { context.startActivity(Intent(context, ListActivity::class.java)) }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Filled.Favorite, contentDescription = "test") },
+                icon = { Icon(Icons.Filled.AccountBox, contentDescription = "test") },
                 label = { Text("Profile") },
                 selected = false,
                 onClick = { context.startActivity(Intent(context, UserPage::class.java)) }

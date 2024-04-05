@@ -13,21 +13,22 @@
         android:theme="@style/Theme.AppCompat"
         tools:targetApi="31">
         <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
             android:name=".MapsComposeActivity"
             android:exported="false"
-            android:label="StreetFinds Map"
-            />
-
+            android:label="StreetFinds Map" />
         <activity
             android:name=".UserPage"
             android:exported="false"
-            android:label="@string/title_activity_user_page"
-            />
+            android:label="@string/title_activity_user_page" />
         <activity
             android:name=".VendorPage"
             android:exported="false"
-            android:label="Vendor Form"
-            />
+            android:label="Vendor Form" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -36,19 +37,15 @@
         <activity
             android:name=".MapsActivity"
             android:exported="false"
-            android:label="Street Finds Map"
-            />
+            android:label="Street Finds Map" />
         <activity
             android:name=".ListActivity"
             android:exported="false"
-            android:label="Vendor List"
-            />
-
+            android:label="Vendor List" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
