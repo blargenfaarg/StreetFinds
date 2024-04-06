@@ -9,4 +9,5 @@
     <string name="title_activity_maps_compose">MapsCompose</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_vendor_login">VendorLoginActivity</string>
+    <string name="title_activity_log_in">LogIn</string>
 </resources>

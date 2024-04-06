@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
 
-class UserPage : AppCompatActivity() {
+class VendorPage : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,7 @@ class UserPage : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
-                    UserGreeting()
+                    VendorGreeting()
                 }
             }
         }
@@ -45,7 +45,7 @@ class UserPage : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun UserGreeting(modifier: Modifier = Modifier.fillMaxSize()) {
+fun VendorGreeting(modifier: Modifier = Modifier.fillMaxSize()) {
     Surface(color = Color.Red, modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -63,7 +63,7 @@ fun UserGreeting(modifier: Modifier = Modifier.fillMaxSize()) {
                     Text(
                         modifier = Modifier.fillMaxHeight(),
 
-                        text = "~USER PAGE IN DEVELOPMENT~",
+                        text = "~VENDOR PAGE IN DEVELOPMENT~",
                         color = Color.Black,
                         fontFamily = FontFamily.Serif,
                         fontWeight = FontWeight.ExtraBold,
@@ -77,7 +77,7 @@ fun UserGreeting(modifier: Modifier = Modifier.fillMaxSize()) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun UserGreetingPreview() {
+fun VendorGreetingPreview() {
     SprintOneTheme {
         UserGreeting()
     }

@@ -38,7 +38,19 @@ fun LoadNavBar() {
                 icon = { Icon(Icons.Filled.AccountBox, contentDescription = "test") },
                 label = { Text("Profile") },
                 selected = false,
-                onClick = { context.startActivity(Intent(context, UserPage::class.java)) }
+                onClick = {
+                    if (UserType.GUEST)
+                    {
+                        context.startActivity(Intent(context, MainActivity::class.java))
+                    }
+                    else if (UserType.BUYER)
+                    {
+                        context.startActivity(Intent(context, UserPage::class.java))
+                    }
+                    else if (UserType.VENDOR) {
+                        context.startActivity(Intent(context, VendorPage::class.java))
+                    }
+                }
             )
     }
 }

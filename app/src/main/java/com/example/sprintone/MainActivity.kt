@@ -1,5 +1,6 @@
 package com.example.sprintone
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -56,79 +57,150 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+object UserType {
+    var BUYER = false
+    var VENDOR = false
+    var GUEST = false
+}
+
 @Preview
 @Composable
 fun LoadGreeting()
 {
     val context = LocalContext.current
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "StreetFinds",
-                textAlign = TextAlign.Center,
-                fontSize = 62.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(
-                modifier = Modifier.padding(10.dp)
-            )
-            Row {
-                Button(
-                    onClick = { context.startActivity(Intent(context, LoginActivity::class.java)) },
-                    modifier = Modifier.width(130.dp)
-                )
-                {
-                    Text(
-                        text = "Users",
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-
-                }
-                Spacer(
-                    modifier = Modifier.padding(16.dp)
-                )
-                Button(
-                    onClick = { context.startActivity(Intent(context, VendorLoginActivity::class.java)) },
-                    modifier = Modifier.width(130.dp)
-                )
-                {
-                    Text(
-                        text = "Vendors",
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-                }
-            }
-
-            Divider(
-                modifier = Modifier.padding(20.dp)
-            )
-            OutlinedButton(
-                onClick = { context.startActivity(Intent(context, ListActivity::class.java)) },
-                colors = ButtonDefaults.buttonColors(Color.LightGray)
-            )
+    if (isUserLoggedIn(context))
+    {
+        val userType = getUserType(context)
+        if (userType != null) {
+            when (userType)
             {
-                Text(
-                    text = "Continue as a guest",
-                    fontSize = 15.sp,
-                    color = Color.Black
-                )
+                "buyer" -> {
+                    UserType.BUYER = true
+                    UserType.VENDOR = false
+                    UserType.GUEST = false
+                }
+                "vendor" -> {
+                    UserType.VENDOR = true
+                    UserType.BUYER = false
+                    UserType.GUEST = false
+                }
             }
+        }
+        context.startActivity(Intent(context, ListActivity::class.java))
+    }
+    else {
+        // User is not logged in, show login screen or perform other actions
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.White
+        ) {
 
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "StreetFinds",
+                    textAlign = TextAlign.Center,
+                    fontSize = 62.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(
+                    modifier = Modifier.padding(10.dp)
+                )
+                Text(
+                    text = "New here? Sign up.",
+                    fontSize = 20.sp
+                )
+                Spacer(
+                    modifier = Modifier.padding(10.dp)
+                )
+                Row {
+
+                    Button(
+                        onClick = {
+                            UserType.BUYER = true
+                            UserType.VENDOR = false
+                            UserType.GUEST = false
+                            context.startActivity(Intent(context, UserSignUp::class.java))
+                        },
+                        modifier = Modifier.width(130.dp)
+                    )
+                    {
+                        Text(
+                            text = "Users",
+                            fontSize = 20.sp,
+                            color = Color.Black
+                        )
+
+                    }
+                    Spacer(
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    Button(
+                        onClick = {
+                            UserType.GUEST = false
+                            UserType.BUYER = false
+                            UserType.VENDOR = true
+                            context.startActivity(Intent(context, VendorSignUp::class.java))
+                        },
+                        modifier = Modifier.width(130.dp)
+                    )
+                    {
+                        Text(
+                            text = "Vendors",
+                            fontSize = 20.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+
+                Divider(
+                    modifier = Modifier.padding(20.dp)
+                )
+
+                OutlinedButton(
+                    onClick = {
+                        context.startActivity(Intent(context, ListActivity::class.java))
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                )
+                {
+                    Text(
+                        text = "Continue as a guest",
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                }
+            }
         }
     }
+}
 
+fun saveUserLoggedInState(context: Context, isLoggedIn: Boolean) {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putBoolean("isLoggedIn", isLoggedIn)
+    editor.apply()
+}
+
+fun isUserLoggedIn(context: Context): Boolean {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    return sharedPreferences.getBoolean("isLoggedIn", false)
+}
+
+fun saveUserType(context: Context, userType: String) {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("userType", userType)
+    editor.apply()
+}
+fun getUserType(context: Context): String? {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("userType", null)
 }
 
 
