@@ -1,5 +1,6 @@
 package com.example.sprintone
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +52,7 @@ fun UserLogInScreen()
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
 
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val db = Firebase.firestore
 
@@ -73,6 +76,7 @@ fun UserLogInScreen()
                 value = password,
                 onValueChange = { password = it },
                 label = { Text(text = "Password", color = Color.Black) },
+                visualTransformation = PasswordVisualTransformation()
             )
 
             Button(
@@ -94,11 +98,13 @@ fun UserLogInScreen()
                                     if (storedPassword == password)
                                     {
                                         successMessage = "Success! Logging in..."
+                                        saveUserLoggedInState(context, true)
+                                        saveUserType(context, "buyer")
                                         coroutineScope.launch {
                                             delay(5000)
                                             successMessage = null
                                         }
-
+                                        context.startActivity(Intent(context, ListActivity::class.java))
                                     }
                                     else
                                     {

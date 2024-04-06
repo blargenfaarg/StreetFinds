@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -164,6 +165,9 @@ fun LoadGreeting()
 
                 OutlinedButton(
                     onClick = {
+                        UserType.GUEST = true
+                        UserType.BUYER = false
+                        UserType.VENDOR = false
                         context.startActivity(Intent(context, ListActivity::class.java))
                     },
                     colors = ButtonDefaults.buttonColors(Color.LightGray)

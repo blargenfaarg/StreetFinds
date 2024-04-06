@@ -1,6 +1,7 @@
 package com.example.sprintone
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
@@ -49,6 +50,9 @@ fun LoadNavBar() {
                     }
                     else if (UserType.VENDOR) {
                         context.startActivity(Intent(context, VendorPage::class.java))
+                    }
+                    else{
+                        Log.e("HEYY LOOK AGAIN", "Button Clicked. ")
                     }
                 }
             )
