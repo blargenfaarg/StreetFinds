@@ -13,40 +13,53 @@
         android:theme="@style/Theme.AppCompat"
         tools:targetApi="31">
         <activity
+            android:name=".UserLogIn"
+            android:exported="false"
+            android:label="@string/title_activity_log_in"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".VendorSignUp"
+            android:exported="false"
+            android:label="@string/title_activity_vendor_login"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".UserSignUp"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".MapsComposeActivity"
+            android:exported="false"
+            android:label="StreetFinds Map" />
+        <activity
             android:name=".UserPage"
             android:exported="false"
             android:label="@string/title_activity_user_page" />
         <activity
             android:name=".VendorPage"
             android:exported="false"
-            android:label="@string/title_activity_vendor_page" />
-        <!--
-             TODO: Before you run your application, you need a Google Maps API key.
+            android:label="Vendor Form" />
+        <activity
+            android:name=".VendorLogIn"
+            android:exported="false"
+            android:label="@string/title_activity_log_in"
+            android:theme="@style/Theme.AppCompat" />
 
-             To get one, follow the directions here:
-
-                https://developers.google.com/maps/documentation/android-sdk/get-api-key
-
-             Once you have your API key (it starts with "AIza"), define a new property in your
-             project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
-             "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
-        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".MapsActivity"
             android:exported="false"
-            android:label="@string/title_activity_maps" />
+            android:label="Street Finds Map" />
         <activity
             android:name=".ListActivity"
             android:exported="false"
-            android:label="ListActivity" />
+            android:label="Vendor List" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,15 +1,32 @@
 package com.example.sprintone
 
+
+import android.content.ContentValues
+import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
-import com.google.android.gms.maps.CameraUpdateFactory
+import android.util.Log
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.example.sprintone.databinding.ActivityMapsBinding
+import com.example.sprintone.ui.theme.SprintOneTheme
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.sprintone.databinding.ActivityMapsBinding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.maps.android.compose.rememberCameraPositionState
+import java.util.Locale
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -22,27 +39,53 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val geocode = Geocoder(this, Locale.getDefault())
+        val db = Firebase.firestore
+
+        try {
+            db.collection("trucks")
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        val location = document.getString("Location")
+                        val truckName = document.getString("Name")
+                        val type = document.getString("Type")
+                        if (location != null) {
+                            val addList = geocode.getFromLocationName(location, 1)
+                            val lat = addList!![0].latitude
+                            val long = addList[0].longitude
+
+                            val pin = LatLng(lat, long)
+                            googleMap.addMarker(
+                                MarkerOptions()
+                                    .position(pin)
+                                    .title(truckName)
+                                    .snippet(type)
+                            )
+                            googleMap.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    pin,
+                                    12.0f
+                                )
+                            ) // Adjust zoom level as needed
+                        } else {
+                            println("Location not found for document ${document.id}")
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            Log.e(ContentValues.TAG, "Error getting documents: ", e)
+        }
     }
 }
+
