@@ -38,6 +38,10 @@
         <activity
             android:name=".VendorPage"
             android:exported="false"
+            android:label="Vendor Profile" />
+        <activity
+            android:name=".VendorForm"
+            android:exported="false"
             android:label="Vendor Form" />
         <activity
             android:name=".VendorLogIn"

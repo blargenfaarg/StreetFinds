@@ -199,6 +199,19 @@ fun getUserType(context: Context): String? {
     return sharedPreferences.getString("userType", null)
 }
 
+fun saveUserEmail(context: Context, email: String)
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("email", email)
+    editor.apply()
+}
+
+fun getUserEmail(context: Context): String? {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("email", null)
+}
+
 
 /*
 @RequiresApi(Build.VERSION_CODES.O)
