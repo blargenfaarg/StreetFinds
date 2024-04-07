@@ -5,14 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -26,8 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
@@ -60,23 +61,45 @@ fun LoadVendorForm()
     val scrollState = rememberScrollState()
 
     var truckName by remember { mutableStateOf("") }
+    var truckPhoneNumber by remember { mutableStateOf("") }
     var truckDescription by remember { mutableStateOf("") }
     var truckType by remember { mutableStateOf("") }
     var truckLocation by remember { mutableStateOf("") }
-    var truckHours by remember { mutableStateOf("")}
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
+    var isPhoneValid by remember { mutableStateOf(true) }
+
+    var truckMondayHours by remember { mutableStateOf("") }
+    var truckTuesdayHours by remember { mutableStateOf("") }
+    var truckWednesdayHours by remember { mutableStateOf("") }
+    var truckThursdayHours by remember { mutableStateOf("") }
+    var truckFridayHours by remember { mutableStateOf("") }
+    var truckSaturdayHours by remember { mutableStateOf("") }
+    var truckSundayHours by remember { mutableStateOf("") }
+
+    var dialogMondayHours by remember { mutableStateOf("") }
+    var dialogTuesdayHours by remember { mutableStateOf("") }
+    var dialogWednesdayHours by remember { mutableStateOf("") }
+    var dialogThursdayHours by remember { mutableStateOf("") }
+    var dialogFridayHours by remember { mutableStateOf("") }
+    var dialogSaturdayHours by remember { mutableStateOf("") }
+    var dialogSundayHours by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false)}
 
     val db = Firebase.firestore
     val coroutineScope = rememberCoroutineScope()
+    val phoneNumberRegex = Regex("^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}\$\n")
+
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize())
     {
 
         Column(
-            verticalArrangement = Arrangement.Top,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.verticalScroll(scrollState)
+            modifier = Modifier
+                .verticalScroll(scrollState)
+                .padding(20.dp)
 
         ) {
             Text(
@@ -92,35 +115,161 @@ fun LoadVendorForm()
                 value = truckName,
                 onValueChange = { truckName = it },
                 label = { Text("Vendor Name") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp).align(Alignment.CenterHorizontally)
-
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+                    .align(Alignment.CenterHorizontally)
             )
+            OutlinedTextField(
+                value = truckPhoneNumber,
+                onValueChange = {
+                    truckPhoneNumber = it
+                    isPhoneValid = phoneNumberRegex.matches(it)
+                                },
+                label = {Text("Business Phone Number") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+                    .align(Alignment.CenterHorizontally),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            )
+            if (!isPhoneValid)
+            {
+                Text(
+                    text = "Please enter a valid phone number (e.g., 9145552574)",
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                )
+            }
             OutlinedTextField(
                 value = truckDescription,
                 onValueChange = { truckDescription = it },
                 label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
-
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
             )
             OutlinedTextField(
                 value = truckType,
                 onValueChange = { truckType = it },
                 label = { Text("Type") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
             )
             OutlinedTextField(
                 value = truckLocation,
                 onValueChange = { truckLocation = it },
                 label = { Text("Address") },
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
             )
+            Text(
+                text = "Business Hours",
+                modifier = Modifier.padding(top = 16.dp),
+                fontWeight = FontWeight.Bold
+            )
+            Button(onClick = {showDialog = true})
+            {
+                Text("Input Business Hours")
+            }
+
+            if (showDialog)
+            {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        Button(onClick = {
+                        truckMondayHours = dialogMondayHours
+                        truckTuesdayHours = dialogTuesdayHours
+                        truckWednesdayHours = dialogWednesdayHours
+                        truckThursdayHours = dialogThursdayHours
+                        truckFridayHours = dialogFridayHours
+                        truckSaturdayHours = dialogSaturdayHours
+                        truckSundayHours = dialogSundayHours
+                        showDialog = false
+                    }, enabled = dialogMondayHours.isNotBlank()
+                                || dialogTuesdayHours.isNotBlank()
+                                || dialogWednesdayHours.isNotBlank()
+                                || dialogThursdayHours.isNotBlank()
+                                || dialogFridayHours.isNotBlank()
+                                || dialogSaturdayHours.isNotBlank()
+                                || dialogSundayHours.isNotBlank()
+                        )
+                        {
+                        Text("Save")
+                    } },
+                    dismissButton = {
+                                    Button(onClick = {
+                                        showDialog = false
+                                    }){
+                                        Text("Cancel")
+                                    }
+                    },
+                    title = {Text("Enter Business Hours")},
+                    text = {Column{
+                        OutlinedTextField(
+                            value = dialogMondayHours,
+                            onValueChange = { dialogMondayHours = it },
+                            label = { Text("Monday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogTuesdayHours,
+                            onValueChange = { dialogTuesdayHours = it },
+                            label = { Text("Tuesday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogWednesdayHours,
+                            onValueChange = { dialogWednesdayHours = it },
+                            label = { Text("Wednesday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogThursdayHours,
+                            onValueChange = { dialogThursdayHours = it },
+                            label = { Text("Thursday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogFridayHours,
+                            onValueChange = { dialogFridayHours = it },
+                            label = { Text("Friday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogSaturdayHours,
+                            onValueChange = { dialogSaturdayHours = it },
+                            label = { Text("Saturday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                        OutlinedTextField(
+                            value = dialogSundayHours,
+                            onValueChange = { dialogSundayHours = it },
+                            label = { Text("Sunday") },
+                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                        )
+                    } }
+                    )
+            }
+
             Button(
                 onClick = {
                     val truck = hashMapOf(
                         "Name" to truckName,
+                        "Phone" to truckPhoneNumber,
                         "Type" to truckType,
                         "Location" to truckLocation,
-                        "Description" to truckDescription
+                        "Description" to truckDescription,
+                        "Monday Hours" to truckMondayHours,
+                        "Tuesday Hours" to truckTuesdayHours,
+                        "Wednesday Hours" to truckWednesdayHours,
+                        "Thursday Hours" to truckThursdayHours,
+                        "Friday Hours" to truckFridayHours,
+                        "Saturday Hours" to truckSaturdayHours,
+                        "Sunday Hours" to truckSundayHours,
                     )
                     db.collection("trucks").whereEqualTo("Name", truckName)
                         .get()
@@ -142,6 +291,7 @@ fun LoadVendorForm()
                                 }
                             }
                         }
+
                 },
                 enabled = truckName.isNotBlank()
                         && truckDescription.isNotBlank()
