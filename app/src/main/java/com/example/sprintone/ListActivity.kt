@@ -1,43 +1,46 @@
 package com.example.sprintone
 
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
@@ -80,12 +83,20 @@ data class Truck(
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun PreviewDisplayList()
+{
+    DisplayList()
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DisplayList() {
     val scrollState = rememberScrollState()
     val truckListState = remember { mutableStateOf<List<Truck>>(emptyList()) }
 
-    LaunchedEffect(key1 = Unit) {
+   LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
         try {
             val querySnapshot = db.collection("trucks").get().await()
@@ -111,49 +122,83 @@ fun DisplayList() {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.verticalScroll(scrollState)
+            modifier = Modifier
+                .verticalScroll(scrollState)
         ) {
-            truckListState.value.forEach { truck ->
-                Card(
-                    modifier = Modifier.padding(10.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        text = truck.name,
-                        textAlign = TextAlign.Center,
-                        color = Color.Black,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 30.sp,
-                    )
-                    Text(
-                        text = truck.type,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(10.dp)
-                    )
-                    Text(
-                        text = truck.location,
-                        modifier = Modifier
-                            .padding(10.dp)
+            Text(
+                text = "StreetFinds",
+                modifier = Modifier.padding(top = 4.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp
+            )
+            Divider(modifier = Modifier.padding(2.dp))
 
-                    )
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        text = truck.description,
-                        color = Color.Black,
-                    )
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        text = "Hours: x AM to x PM",
-                        color = Color.Black,
-                    )
+            truckListState.value.forEach { truck ->
+                val randomNumber = (50..360).random()
+
+                Card(modifier = Modifier
+                    .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 5.dp)
+                    .align(Alignment.CenterHorizontally))
+                {
+                    Row(modifier = Modifier.fillMaxWidth()){
+                        OutlinedCard(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp),
+                            colors = CardDefaults.outlinedCardColors(Color.hsl(randomNumber.toFloat(), 0.5f, 0.92f)),
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_foodtruck),
+                                contentDescription = "A food truck",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .width(100.dp)
+                                    .height(100.dp)
+                                    .padding(10.dp)
+                            )
+                        }
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text(
+                                modifier = Modifier,
+                                text = truck.name,
+                                textAlign = TextAlign.Left,
+                                color = Color.Black,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp,
+                            )
+                            Text(
+                                text = truck.type,
+                                textAlign = TextAlign.Left,
+                                modifier = Modifier,
+                            )
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.Place,
+                                    contentDescription = "A pin",
+                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = truck.location,
+                                    modifier = Modifier
+                                )
+                            }
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.DateRange,
+                                    contentDescription = "A clock",
+                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    modifier = Modifier.align(Alignment.CenterVertically),
+                                    text = "Hours: 11:00 AM - 3:00 PM"
+                                )
+                            }
+                        }
+                    }
                 }
+                Divider(modifier = Modifier.width(300.dp))
             }
         }
     }

@@ -34,17 +34,14 @@ import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-
-class MainActivity : ComponentActivity() {
-    val db = Firebase.firestore
-
+class MainActivity : ComponentActivity()
+{
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SprintOneTheme {
                 LoadGreeting()
-            // LoadMainScreen()
             }
         }
     }
@@ -211,84 +208,3 @@ fun getUserEmail(context: Context): String? {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     return sharedPreferences.getString("email", null)
 }
-
-
-/*
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun LoadMainScreen(modifier: Modifier = Modifier) {
-    val mContext = LocalContext.current
-
-    Surface(color = Color.Red,
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoadSearchBar()
-            Text(
-                "StreetFinds",
-                modifier = Modifier.fillMaxHeight(),
-                textAlign = TextAlign.Center,
-                fontSize = 62.sp,
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold
-            )
-        }
-    }
-
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        )  {
-            Button(
-                modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                onClick =  {
-                    mContext.startActivity(Intent(mContext, MapsComposeActivity::class.java))
-                },
-            )
-            {
-                Text("Map", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = TextUnit(0.9F, TextUnitType.Sp))
-            }
-            Button(
-                modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                onClick =  {
-                    mContext.startActivity(Intent(mContext, ListActivity::class.java))
-                },
-            ) {
-
-                Text("List", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = TextUnit(0.9F, TextUnitType.Sp))
-            }
-            Button(
-                modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                onClick =  {
-                    mContext.startActivity(Intent(mContext, VendorPage::class.java))
-                },
-            ) {
-
-                Text("Vendors", color = Color.White,  fontWeight = FontWeight.Bold, fontSize = 12.sp, letterSpacing = TextUnit(0.9F, TextUnitType.Sp))
-            }
-            Button(
-                modifier = Modifier.padding(vertical = 2.dp, horizontal = 2.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                onClick =  {
-                    mContext.startActivity(Intent(mContext, UserPage::class.java))
-                },
-
-            ) {
-                Text("Users", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, letterSpacing = TextUnit(0.9F, TextUnitType.Sp))
-            }
-        }
-}
-
- */
-
-
-
