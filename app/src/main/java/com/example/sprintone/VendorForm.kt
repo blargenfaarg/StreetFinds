@@ -92,12 +92,11 @@ fun LoadVendorForm()
 
     val db = Firebase.firestore
     val coroutineScope = rememberCoroutineScope()
-    val phoneNumberRegex = Regex("^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}\$\n")
+    val phoneNumberRegex = Regex("\\(\\d{3}\\)\\s\\d{3}-\\d{4}|\\d{10}")
 
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize())
     {
-
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -140,7 +139,7 @@ fun LoadVendorForm()
             if (!isPhoneValid)
             {
                 Text(
-                    text = "Please enter a valid phone number (e.g., 9145552574)",
+                    text = "Please enter a valid phone number (e.g. (123) 456-7890",
                     color = Color.Red,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                 )
