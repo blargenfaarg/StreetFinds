@@ -284,6 +284,7 @@ fun LoadVendorForm()
                                 coroutineScope.launch {
                                     delay(5000)
                                     successMessage = null
+                                    context.startActivity(Intent(context, ListActivity::class.java))
                                 }
                             }
                             else{
@@ -304,7 +305,6 @@ fun LoadVendorForm()
                                 db.collection("vendors").document(vendorId).update("Business Name", truckName)
                             }
                         }
-                    context.startActivity(Intent(context, ListActivity::class.java))
 
                 },
                 enabled = truckName.isNotBlank()
