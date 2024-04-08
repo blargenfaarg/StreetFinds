@@ -1,5 +1,6 @@
 package com.example.sprintone
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -58,7 +60,9 @@ class VendorForm : ComponentActivity() {
 @Composable
 fun LoadVendorForm()
 {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val email = getUserEmail(context)
 
     var truckName by remember { mutableStateOf("") }
     var truckPhoneNumber by remember { mutableStateOf("") }
@@ -291,6 +295,17 @@ fun LoadVendorForm()
                                 }
                             }
                         }
+
+                    db.collection("vendors").whereEqualTo("Email", email)
+                        .get()
+                        .addOnSuccessListener { documents ->
+                            if (!documents.isEmpty) {
+                                val vendorDoc = documents.documents.first()
+                                val vendorId = vendorDoc.id
+                                db.collection("vendors").document(vendorId).update("Business Name", truckName)
+                            }
+                        }
+                    context.startActivity(Intent(context, ListActivity::class.java))
 
                 },
                 enabled = truckName.isNotBlank()

@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -80,6 +81,7 @@ fun UserLogInScreen()
                 onValueChange = { email = it },
                 label = { Text(text = "Email", color = Color.Black) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Email,
@@ -95,6 +97,7 @@ fun UserLogInScreen()
                 label = { Text(text = "Password", color = Color.Black) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Lock,

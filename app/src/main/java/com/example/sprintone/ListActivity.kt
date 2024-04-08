@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,12 +33,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +52,9 @@ import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ListActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -79,7 +87,15 @@ data class Truck(
     val name: String,
     val location: String,
     val description: String,
-    val type: String
+    val type: String,
+    val mondayHours : String,
+    val tuesdayHours : String,
+    val wednesdayHours : String,
+    val thursdayHours : String,
+    val fridayHours : String,
+    val saturdayHours : String,
+    val sundayHours : String,
+
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -95,6 +111,9 @@ fun PreviewDisplayList()
 fun DisplayList() {
     val scrollState = rememberScrollState()
     val truckListState = remember { mutableStateOf<List<Truck>>(emptyList()) }
+    val calendar = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+    val day = dateFormat.format(calendar.time)
 
    LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
@@ -105,9 +124,23 @@ fun DisplayList() {
                 val location = document.getString("Location")
                 val description = document.getString("Description")
                 val type = document.getString("Type")
+                val truckMondayHours = document.getString("Monday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckTuesdayHours = document.getString("Tuesday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckWednesdayHours = document.getString("Wednesday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckThursdayHours = document.getString("Thursday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckFridayHours = document.getString("Friday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckSaturdayHours = document.getString("Saturday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+                val truckSundayHours = document.getString("Sunday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
+
 
                 if (truckName != null && location != null && description != null && type != null) {
-                    Truck(truckName, location, description, type)
+                    Truck(truckName, location, description, type, truckMondayHours,
+                        truckTuesdayHours,
+                        truckWednesdayHours,
+                        truckThursdayHours,
+                        truckFridayHours,
+                        truckSaturdayHours,
+                        truckSundayHours)
                 } else {
                     null
                 }
@@ -116,7 +149,7 @@ fun DisplayList() {
         } catch (e: Exception) {
             Log.e(TAG, "Error getting documents: ", e)
         }
-    }
+    } // 8:00AM - 5:00PM
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -125,12 +158,21 @@ fun DisplayList() {
             modifier = Modifier
                 .verticalScroll(scrollState)
         ) {
-            Text(
-                text = "StreetFinds",
-                modifier = Modifier.padding(top = 4.dp),
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp
-            )
+            Row {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.truckpin),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.height(50.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "StreetFinds",
+                    modifier = Modifier.padding(top = 4.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp
+                )
+            }
             Divider(modifier = Modifier.padding(2.dp))
 
             truckListState.value.forEach { truck ->
@@ -190,10 +232,16 @@ fun DisplayList() {
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    modifier = Modifier.align(Alignment.CenterVertically),
-                                    text = "Hours: 11:00 AM - 3:00 PM"
-                                )
+
+                                when(day){
+                                    "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Sunday" -> GenerateDayText("Sunday", truck.sundayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                }
                             }
                         }
                     }
@@ -204,5 +252,14 @@ fun DisplayList() {
     }
 }
 
+@Composable
+fun GenerateDayText(day: String, hours: String, modifier: Modifier)
+{
+    return Text(
+        modifier = modifier,
+        text = "$day Hours: $hours",
+        fontSize = 12.sp
+    )
+}
 
 
