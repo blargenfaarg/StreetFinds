@@ -67,6 +67,7 @@ class VendorPage : ComponentActivity() {
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @Preview
@@ -74,16 +75,17 @@ fun VendorGreeting()
 {
 
     val context = LocalContext.current
-    val email = getUserEmail(context)
     val db = Firebase.firestore
+    val email = getUserEmail(context)
     val scrollState = rememberScrollState()
-    
+
     var businessName by remember { mutableStateOf("")}
     var businessDescription by remember { mutableStateOf("")}
     var businessType by remember { mutableStateOf("")}
     var businessLocation by remember { mutableStateOf("")}
     var hasEnteredBusiness by remember { mutableStateOf(false)}
     var showDialog by remember { mutableStateOf(false)}
+    var showHoursDialog by remember { mutableStateOf(false)}
 
     var newBusinessName by remember { mutableStateOf("")}
     var newBusinessDescription by remember { mutableStateOf("")}
@@ -94,6 +96,32 @@ fun VendorGreeting()
     var descriptionWasChanged by remember { mutableStateOf(false)}
     var locationWasChanged by remember { mutableStateOf(false)}
     var typeWasChanged by remember { mutableStateOf(false)}
+
+    var mondayHoursWereChanged by remember { mutableStateOf(false)}
+    var tuesdayHoursWereChanged by remember { mutableStateOf(false)}
+    var wednesdayHoursWereChanged by remember { mutableStateOf(false)}
+    var thursdayHoursWereChanged by remember { mutableStateOf(false)}
+    var fridayHoursWereChanged by remember { mutableStateOf(false)}
+    var saturdayHoursWereChanged by remember { mutableStateOf(false)}
+    var sundayHoursWereChanged by remember { mutableStateOf(false)}
+    var wereHoursUpdated by remember{ mutableStateOf(false)}
+
+
+    var truckMondayHours by remember { mutableStateOf("") }
+    var truckTuesdayHours by remember { mutableStateOf("") }
+    var truckWednesdayHours by remember { mutableStateOf("") }
+    var truckThursdayHours by remember { mutableStateOf("") }
+    var truckFridayHours by remember { mutableStateOf("") }
+    var truckSaturdayHours by remember { mutableStateOf("") }
+    var truckSundayHours by remember { mutableStateOf("") }
+
+    var dialogMondayHours by remember { mutableStateOf("") }
+    var dialogTuesdayHours by remember { mutableStateOf("") }
+    var dialogWednesdayHours by remember { mutableStateOf("") }
+    var dialogThursdayHours by remember { mutableStateOf("") }
+    var dialogFridayHours by remember { mutableStateOf("") }
+    var dialogSaturdayHours by remember { mutableStateOf("") }
+    var dialogSundayHours by remember { mutableStateOf("") }
 
 
     Surface(modifier = Modifier.fillMaxSize())
@@ -130,6 +158,13 @@ fun VendorGreeting()
                                     businessDescription = document.getString("Description").toString()
                                     businessLocation = document.getString("Location").toString()
                                     businessType = document.getString("Type").toString()
+                                    truckMondayHours = document.getString("Monday Hours").toString()
+                                    truckTuesdayHours = document.getString("Tuesday Hours").toString()
+                                    truckWednesdayHours = document.getString("Wednesday Hours").toString()
+                                    truckThursdayHours = document.getString("Thursday Hours").toString()
+                                    truckFridayHours = document.getString("Friday Hours").toString()
+                                    truckSaturdayHours = document.getString("Saturday Hours").toString()
+                                    truckSundayHours = document.getString("Sunday Hours").toString()
                                 }
                             }
                         }
@@ -194,9 +229,7 @@ fun VendorGreeting()
                         confirmButton = {
                             Button(onClick = {
                                 showDialog = false
-
-                                if (nameWasChanged)
-                                {
+                                if (nameWasChanged) {
                                     db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
@@ -219,8 +252,7 @@ fun VendorGreeting()
                                             }
                                         }
                                 }
-                                if (descriptionWasChanged)
-                                {
+                                if (descriptionWasChanged) {
                                     db.collection("trucks").whereEqualTo("Description", businessDescription)
                                         .get()
                                         .addOnSuccessListener { documents ->
@@ -233,9 +265,7 @@ fun VendorGreeting()
                                             }
                                         }
                                 }
-
-                                if(locationWasChanged)
-                                {
+                                if(locationWasChanged) {
                                     db.collection("trucks").whereEqualTo("Location", businessLocation)
                                         .get()
                                         .addOnSuccessListener { documents ->
@@ -248,9 +278,7 @@ fun VendorGreeting()
                                             }
                                         }
                                 }
-
-                                if(typeWasChanged)
-                                {
+                                if(typeWasChanged) {
                                     db.collection("trucks").whereEqualTo("Type", businessType)
                                         .get()
                                         .addOnSuccessListener { documents ->
@@ -263,10 +291,102 @@ fun VendorGreeting()
                                             }
                                         }
                                 }
+                                if(mondayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Monday Hours", truckMondayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Monday Hours", dialogMondayHours)
+
+                                                truckMondayHours = dialogMondayHours
+                                            }
+                                        }
+                                }
+                                if (tuesdayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Tuesday Hours", truckTuesdayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Tuesday Hours", dialogTuesdayHours)
+
+                                                truckTuesdayHours = dialogTuesdayHours
+                                            }
+                                        }
+                                }
+                                if (wednesdayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Wednesday Hours", truckWednesdayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Wednesday Hours", dialogWednesdayHours)
+
+                                                truckWednesdayHours = dialogWednesdayHours
+                                            }
+                                        }
+                                }
+                                if (thursdayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Thursday Hours", truckThursdayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Thursday Hours", dialogThursdayHours)
+
+                                                truckThursdayHours = dialogThursdayHours
+                                            }
+                                        }
+                                }
+                                if (fridayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Friday Hours", truckFridayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Friday Hours", dialogFridayHours)
+
+                                                truckFridayHours = dialogFridayHours
+                                            }
+                                        }
+                                }
+                                if (saturdayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Saturday Hours", truckSaturdayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Saturday Hours", dialogSaturdayHours)
+
+                                                truckSaturdayHours = dialogSaturdayHours
+                                            }
+                                        }
+                                }
+                                if (sundayHoursWereChanged) {
+                                    db.collection("trucks").whereEqualTo("Sunday Hours", truckSundayHours)
+                                        .get()
+                                        .addOnSuccessListener { documents ->
+                                            if (!documents.isEmpty) {
+                                                val vendorDoc = documents.documents.first()
+                                                val vendorId = vendorDoc.id
+                                                db.collection("trucks").document(vendorId).update("Sunday Hours", dialogSundayHours)
+
+                                                truckSundayHours = dialogSundayHours
+                                            }
+                                        }
+                                }
                                              },
-                                enabled = newBusinessName.isNotBlank()
+                                enabled = (newBusinessName.isNotBlank()
+                                        || newBusinessType.isNotBlank()
                                         || newBusinessDescription.isNotBlank()
-                                        || newBusinessLocation.isNotBlank()
+                                        || newBusinessLocation.isNotBlank()) || wereHoursUpdated
                             )
                             {
                                 Text("Update")
@@ -348,7 +468,133 @@ fun VendorGreeting()
                                         .fillMaxWidth()
                                         .padding(4.dp)
                                 )
-
+                                Button(onClick = {
+                                    showHoursDialog = true
+                                })
+                                {
+                                    Text("Update Hours")
+                                }
+                                if (showHoursDialog)
+                                {
+                                    AlertDialog(
+                                        onDismissRequest = { showDialog = false },
+                                        confirmButton = {
+                                            Button(onClick = {
+                                                showHoursDialog = false
+                                                wereHoursUpdated = true
+                                            }, enabled = dialogMondayHours.isNotBlank()
+                                                    || dialogTuesdayHours.isNotBlank()
+                                                    || dialogWednesdayHours.isNotBlank()
+                                                    || dialogThursdayHours.isNotBlank()
+                                                    || dialogFridayHours.isNotBlank()
+                                                    || dialogSaturdayHours.isNotBlank()
+                                                    || dialogSundayHours.isNotBlank())
+                                            {
+                                                Text("Save")
+                                            } },
+                                        dismissButton = { Button(onClick = { showHoursDialog = false })
+                                        {
+                                            Text("Cancel")
+                                        } },
+                                        title = {Text("Enter New Hours")},
+                                        text = {
+                                            Column{
+                                                OutlinedTextField(
+                                                    value = dialogMondayHours,
+                                                    onValueChange = {
+                                                        dialogMondayHours = it
+                                                        if (dialogMondayHours == truckMondayHours)
+                                                        {
+                                                            mondayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            mondayHoursWereChanged = true
+                                                        }
+                                                    },
+                                                    label = { Text("Monday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogTuesdayHours,
+                                                    onValueChange = {  dialogTuesdayHours = it
+                                                        if (dialogTuesdayHours == truckTuesdayHours)
+                                                        {
+                                                            tuesdayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            tuesdayHoursWereChanged = true
+                                                        }},
+                                                    label = { Text("Tuesday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogWednesdayHours,
+                                                    onValueChange = {  dialogMondayHours = it
+                                                        if (dialogWednesdayHours == truckWednesdayHours)
+                                                        {
+                                                            wednesdayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            wednesdayHoursWereChanged = true
+                                                        } },
+                                                    label = { Text("Wednesday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogThursdayHours,
+                                                    onValueChange = {  dialogThursdayHours = it
+                                                        if (dialogThursdayHours == truckThursdayHours)
+                                                        {
+                                                            thursdayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            thursdayHoursWereChanged = true
+                                                        } },
+                                                    label = { Text("Thursday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogFridayHours,
+                                                    onValueChange = {  dialogFridayHours = it
+                                                        if (dialogFridayHours == truckFridayHours)
+                                                        {
+                                                            fridayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            fridayHoursWereChanged = true
+                                                        } },
+                                                    label = { Text("Friday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogSaturdayHours,
+                                                    onValueChange = {  dialogSaturdayHours = it
+                                                        if (dialogSaturdayHours == truckSaturdayHours)
+                                                        {
+                                                            saturdayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            saturdayHoursWereChanged = true
+                                                        } },
+                                                    label = { Text("Saturday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                                OutlinedTextField(
+                                                    value = dialogSundayHours,
+                                                    onValueChange = {  dialogSundayHours = it
+                                                        if (dialogSundayHours == truckSundayHours)
+                                                        {
+                                                            sundayHoursWereChanged = false
+                                                        }
+                                                        else{
+                                                            sundayHoursWereChanged = true
+                                                        } },
+                                                    label = { Text("Sunday") },
+                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                )
+                                            } }
+                                    )
+                                }
                             }
                         }
                     )
