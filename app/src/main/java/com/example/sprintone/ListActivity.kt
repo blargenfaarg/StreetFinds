@@ -1,6 +1,7 @@
 package com.example.sprintone
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -22,10 +23,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -106,6 +110,7 @@ fun PreviewDisplayList()
     DisplayList()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DisplayList() {
@@ -114,6 +119,7 @@ fun DisplayList() {
     val calendar = Calendar.getInstance()
     val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     val day = dateFormat.format(calendar.time)
+    val context = LocalContext.current
 
    LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
@@ -132,7 +138,6 @@ fun DisplayList() {
                 val truckSaturdayHours = document.getString("Saturday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
                 val truckSundayHours = document.getString("Sunday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
 
-
                 if (truckName != null && location != null && description != null && type != null) {
                     Truck(truckName, location, description, type, truckMondayHours,
                         truckTuesdayHours,
@@ -149,15 +154,13 @@ fun DisplayList() {
         } catch (e: Exception) {
             Log.e(TAG, "Error getting documents: ", e)
         }
-    } // 8:00AM - 5:00PM
-
+    }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .verticalScroll(scrollState)
-        ) {
+            modifier = Modifier.verticalScroll(scrollState))
+        {
             Row {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.truckpin),
@@ -172,15 +175,32 @@ fun DisplayList() {
                     fontWeight = FontWeight.Bold,
                     fontSize = 30.sp
                 )
-            }
+            } // HEADER "StreetFinds" + Logo
             Divider(modifier = Modifier.padding(2.dp))
-
             truckListState.value.forEach { truck ->
                 val randomNumber = (50..360).random()
-
                 Card(modifier = Modifier
                     .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 5.dp)
-                    .align(Alignment.CenterHorizontally))
+                    .align(Alignment.CenterHorizontally),
+                    onClick = {
+
+                        /*
+
+                        This code is commented out for the moment.
+                        When the VendorProfilePage is complete, this is where we'll
+                        hook it up.
+
+                        val intent = Intent(context, VendorProfilePage::class.java)
+                        intent.putExtra("name", truck.name)
+                        intent.putExtra("description", truck.description)
+                        intent.putExtra("type", truck.type)
+                        intent.putExtra("location", truck.location)
+                        intent.putExtra("colorVal", randomNumber)
+
+                        context.startActivity(intent)
+
+                         */
+                    })
                 {
                     Row(modifier = Modifier.fillMaxWidth()){
                         OutlinedCard(
@@ -192,27 +212,14 @@ fun DisplayList() {
                             Icon(
                                 painter = painterResource(R.drawable.icon_foodtruck),
                                 contentDescription = "A food truck",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(100.dp)
-                                    .padding(10.dp)
-                            )
+                                tint = Color.Black, modifier = Modifier
+                                    .width(100.dp).height(100.dp).padding(10.dp))
                         }
                         Column(modifier = Modifier.padding(10.dp)) {
-                            Text(
-                                modifier = Modifier,
-                                text = truck.name,
-                                textAlign = TextAlign.Left,
-                                color = Color.Black,
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp,
-                            )
-                            Text(
-                                text = truck.type,
-                                textAlign = TextAlign.Left,
-                                modifier = Modifier,
-                            )
+                            Text(modifier = Modifier, text = truck.name,
+                                textAlign = TextAlign.Left, color = Color.Black,
+                                fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                            Text(text = truck.type, textAlign = TextAlign.Left)
                             Row {
                                 Icon(
                                     imageVector = Icons.Filled.Place,
@@ -261,5 +268,7 @@ fun GenerateDayText(day: String, hours: String, modifier: Modifier)
         fontSize = 12.sp
     )
 }
+
+
 
 

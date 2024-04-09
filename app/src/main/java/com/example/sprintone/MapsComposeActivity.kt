@@ -118,7 +118,15 @@ fun LoadMap() {
                     title = marker.title, snippet = marker.snippet,
                     icon = bitmapDescriptorFromVector(context, R.drawable.truckpin),
                     onInfoWindowClick = {
-                        context.startActivity(Intent(context, ListActivity::class.java))
+                        /* This code is commented out for the moment.
+                        When the VendorProfilePage is complete, this is where we'll
+                        hook it up.
+
+                        val intent = Intent(context, VendorProfilePage::class.java)
+                        intent.putExtra("name", marker.title)
+                        context.startActivity(intent)
+
+                         */
                     }
                 )
             }

@@ -27,6 +27,8 @@ import com.google.firebase.firestore.firestore
 import com.google.maps.android.compose.rememberCameraPositionState
 import java.util.Locale
 
+// Don't use this activity, use the new "MapsComposeActivity".
+// I don't want to delete this because it might mess up the AndroidManifest.xml...
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -45,6 +47,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    // **** Don't use this activity, use the new "MapsComposeActivity".
+    // **** I don't want to delete this because it might mess up the AndroidManifest.xml...
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -88,4 +92,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 }
+
+// Don't use this activity, use the new "MapsComposeActivity".
+// I don't want to delete this because it might mess up the AndroidManifest.xml...
 

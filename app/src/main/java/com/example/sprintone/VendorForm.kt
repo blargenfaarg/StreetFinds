@@ -211,7 +211,9 @@ fun LoadVendorForm()
                                     }
                     },
                     title = {Text("Enter Business Hours")},
-                    text = {Column{
+                    text = {
+                        Column{
+
                         OutlinedTextField(
                             value = dialogMondayHours,
                             onValueChange = { dialogMondayHours = it },
