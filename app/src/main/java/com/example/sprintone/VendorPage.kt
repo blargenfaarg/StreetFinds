@@ -77,6 +77,7 @@ fun VendorGreeting()
     val context = LocalContext.current
     val db = Firebase.firestore
     val email = getUserEmail(context)
+    Log.e("Error", "Email is: $email")
     val scrollState = rememberScrollState()
 
     var businessName by remember { mutableStateOf("")}
@@ -241,7 +242,7 @@ fun VendorGreeting()
                                                 businessName = newBusinessName
                                             }
                                         }
-                                    db.collection("vendors").whereEqualTo("Email", email)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -253,7 +254,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (descriptionWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Description", businessDescription)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -266,7 +267,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if(locationWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Location", businessLocation)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -279,7 +280,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if(typeWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Type", businessType)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -292,7 +293,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if(mondayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Monday Hours", truckMondayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -305,7 +306,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (tuesdayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Tuesday Hours", truckTuesdayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -318,7 +319,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (wednesdayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Wednesday Hours", truckWednesdayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -331,7 +332,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (thursdayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Thursday Hours", truckThursdayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -344,7 +345,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (fridayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Friday Hours", truckFridayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -357,7 +358,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (saturdayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Saturday Hours", truckSaturdayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -370,7 +371,7 @@ fun VendorGreeting()
                                         }
                                 }
                                 if (sundayHoursWereChanged) {
-                                    db.collection("trucks").whereEqualTo("Sunday Hours", truckSundayHours)
+                                    db.collection("trucks").whereEqualTo("Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -529,7 +530,7 @@ fun VendorGreeting()
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogWednesdayHours,
-                                                    onValueChange = {  dialogMondayHours = it
+                                                    onValueChange = {  dialogWednesdayHours = it
                                                         if (dialogWednesdayHours == truckWednesdayHours)
                                                         {
                                                             wednesdayHoursWereChanged = false
