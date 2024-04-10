@@ -27,7 +27,11 @@ fun LoadNavBar() {
                 icon = { Icon(Icons.Filled.Place, contentDescription = "test") },
                 label = { Text("Map") },
                 selected = false,
-                onClick = { context.startActivity(Intent(context, MapsComposeActivity::class.java)) }
+                onClick = {
+                    val intent = Intent(context, MapsComposeActivity::class.java)
+                    intent.putExtra("ignore", "ignore")
+                    context.startActivity(intent)
+                }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "test") },

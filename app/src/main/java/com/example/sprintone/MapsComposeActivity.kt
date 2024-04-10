@@ -12,11 +12,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +43,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.tasks.await
 import java.util.Locale
 
 
@@ -61,7 +66,18 @@ class MapsComposeActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         )
                         {
-                            LoadMap()
+                            val extras = intent.extras
+                            val test = extras?.getString("ignore")
+
+                            if (test.equals("ignore"))
+                            {
+                                LoadMap()
+                            }
+                            else{
+                                Log.e("Error", "Intent.extras.isEmpty is false")
+                                val query = extras?.getString("query")
+                                LoadMapBySearch(query.toString())
+                            }
                         }
                     }
                 }
@@ -69,6 +85,73 @@ class MapsComposeActivity : ComponentActivity() {
         }
     }
 }
+
+
+@Composable fun LoadMapBySearch(query : String)
+{
+    var markerData by remember { mutableStateOf<List<MarkerData>>(emptyList()) }
+    val context = LocalContext.current
+    val camarillo = LatLng(34.2164, -119.0376)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(camarillo, 12f)
+    }
+
+    LaunchedEffect(Unit)
+    {
+        val db = Firebase.firestore
+        val geocode = Geocoder(context, Locale.getDefault())
+
+        try {
+            val querySnapshot = db.collection("trucks")
+                .whereEqualTo("Name", query)
+                .get()
+                .await()
+            if (!querySnapshot.isEmpty)
+            {
+                val document = querySnapshot.documents.first()
+                val location = document.getString("Location")
+                val truckName = document.getString("Name")
+                val type = document.getString("Type")
+                val newData = mutableListOf<MarkerData>()
+
+                if (location != null) {
+                    val addList = geocode.getFromLocationName(location, 1)
+                    val lat = addList!![0].latitude
+                    val long = addList[0].longitude
+                    newData.add(MarkerData(LatLng(lat, long), truckName ?: "", type ?: ""))
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(lat, long), 12f)
+
+                } else {
+                    Log.d("LoadMap", "Location not found for document ${document.id}")
+                }
+                markerData = newData
+            }
+        } catch (e: Exception) {
+            Log.e("LoadMap", "Error getting documents: ", e)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+
+        LoadSearchBar()
+
+        GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState) {
+            markerData.forEach { marker ->
+                Marker(
+                    state = MarkerState(position = marker.position),
+                    title = marker.title, snippet = marker.snippet,
+                    icon = bitmapDescriptorFromVector(context, R.drawable.truckpin),
+                    onInfoWindowClick = {
+                        val intent = Intent(context, VendorProfilePage::class.java)
+                        intent.putExtra("name", marker.title)
+                        context.startActivity(intent)
+                    }
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun LoadMap() {
@@ -118,13 +201,21 @@ fun LoadMap() {
                     title = marker.title, snippet = marker.snippet,
                     icon = bitmapDescriptorFromVector(context, R.drawable.truckpin),
                     onInfoWindowClick = {
-                        context.startActivity(Intent(context, ListActivity::class.java))
+
+                        val intent = Intent(context, VendorProfilePage::class.java)
+                        intent.putExtra("name", marker.title)
+                        context.startActivity(intent)
+
                     }
                 )
             }
         }
     }
 }
+
+
+
+
 data class MarkerData(val position: LatLng, val title: String, val snippet: String)
 
 private fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescriptor {

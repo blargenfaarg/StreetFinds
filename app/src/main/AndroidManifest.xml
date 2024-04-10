@@ -23,6 +23,12 @@
             android:label="@string/title_activity_vendor_login"
             android:theme="@style/Theme.AppCompat" />
         <activity
+            android:name=".VendorProfilePage"
+            android:exported="false"
+            android:label="VendorProfilePage"
+            android:theme="@style/Theme.AppCompat" />
+
+        <activity
             android:name=".UserSignUp"
             android:exported="false"
             android:label="@string/title_activity_login"
