@@ -130,7 +130,9 @@ fun VendorGreeting()
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(8.dp).verticalScroll(scrollState)
+            modifier = Modifier
+                .padding(8.dp)
+                .verticalScroll(scrollState)
         ){
             Text(
                 text = "Welcome $email",
@@ -223,6 +225,9 @@ fun VendorGreeting()
                 {
                     Text("Update Vendor Info")
                 }
+
+                PickImageFromGallery()
+
                 if (showDialog)
                 {
                     AlertDialog(
@@ -513,7 +518,9 @@ fun VendorGreeting()
                                                         }
                                                     },
                                                     label = { Text("Monday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogTuesdayHours,
@@ -526,7 +533,9 @@ fun VendorGreeting()
                                                             tuesdayHoursWereChanged = true
                                                         }},
                                                     label = { Text("Tuesday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogWednesdayHours,
@@ -539,7 +548,9 @@ fun VendorGreeting()
                                                             wednesdayHoursWereChanged = true
                                                         } },
                                                     label = { Text("Wednesday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogThursdayHours,
@@ -552,7 +563,9 @@ fun VendorGreeting()
                                                             thursdayHoursWereChanged = true
                                                         } },
                                                     label = { Text("Thursday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogFridayHours,
@@ -565,7 +578,9 @@ fun VendorGreeting()
                                                             fridayHoursWereChanged = true
                                                         } },
                                                     label = { Text("Friday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogSaturdayHours,
@@ -578,7 +593,9 @@ fun VendorGreeting()
                                                             saturdayHoursWereChanged = true
                                                         } },
                                                     label = { Text("Saturday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                                 OutlinedTextField(
                                                     value = dialogSundayHours,
@@ -591,7 +608,9 @@ fun VendorGreeting()
                                                             sundayHoursWereChanged = true
                                                         } },
                                                     label = { Text("Sunday") },
-                                                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp)
                                                 )
                                             } }
                                     )
