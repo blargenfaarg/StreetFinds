@@ -202,7 +202,6 @@ fun VendorSignUpForm()
                     color = Color.Black
                 )
             }
-
             OutlinedButton(
                 onClick = {
                     context.startActivity(Intent(context, VendorLogIn::class.java))
