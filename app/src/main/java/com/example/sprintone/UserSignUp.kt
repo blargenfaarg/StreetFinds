@@ -64,9 +64,11 @@ fun UserSignUpForm()
 {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var verifyPass by remember { mutableStateOf("")}
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     var isEmailValid by remember { mutableStateOf(true) }
+    var doPasswordsMatch by remember { mutableStateOf(true)}
 
 
     val coroutineScope = rememberCoroutineScope()
@@ -94,7 +96,9 @@ fun UserSignUpForm()
                     isEmailValid = emailRegex.matches(it)
                                 },
                 label = { Text(text = "Enter an email address", color = Color.Black) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 leadingIcon = {
                     Icon(
@@ -115,7 +119,9 @@ fun UserSignUpForm()
                 value = password,
                 onValueChange = { password  = it },
                 label = { Text(text = "Enter a password", color = Color.Black) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 leadingIcon = {
@@ -126,6 +132,29 @@ fun UserSignUpForm()
                     )
                 }
             )
+            OutlinedTextField(
+                value = verifyPass,
+                onValueChange = {
+                    verifyPass = it
+                    doPasswordsMatch = verifyPass == password
+                },
+                label = {Text(text = "Re-enter password", color = Color.Black)},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Lock,
+                        contentDescription = null,
+                        tint = Color.Black
+                    )
+                }
+            )
+            if (!doPasswordsMatch){
+                Text(text = "Passwords do not match", color = Color.Red, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+            }
             Button(
                 onClick = {
                     val user = hashMapOf(
@@ -164,7 +193,7 @@ fun UserSignUpForm()
                             }
                 },
                 enabled = email.isNotBlank()
-                        && password.isNotBlank(),
+                        && password.isNotBlank() &&verifyPass.isNotBlank() && doPasswordsMatch,
                 modifier = Modifier
                     .height(80.dp)
                     .width(250.dp)

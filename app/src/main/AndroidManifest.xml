@@ -6,9 +6,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/icon_streetfinds"
+        android:label="StreetFinds"
+        android:roundIcon="@mipmap/icon_streetfinds_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat"
         tools:targetApi="31">
@@ -54,15 +54,9 @@
             android:exported="false"
             android:label="@string/title_activity_log_in"
             android:theme="@style/Theme.AppCompat" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
-
-        <activity
-            android:name=".MapsActivity"
-            android:exported="false"
-            android:label="Street Finds Map" />
         <activity
             android:name=".ListActivity"
             android:exported="false"

@@ -64,9 +64,11 @@ fun VendorSignUpForm()
 {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var verifyPass by remember { mutableStateOf("")}
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     var isEmailValid by remember { mutableStateOf(true) }
+    var doPasswordsMatch by remember { mutableStateOf(true)}
 
     val coroutineScope = rememberCoroutineScope()
     val emailRegex = Regex("""^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$""")
@@ -125,6 +127,29 @@ fun VendorSignUpForm()
                     )
                 }
             )
+            OutlinedTextField(
+                value = verifyPass,
+                onValueChange = {
+                    verifyPass = it
+                    doPasswordsMatch = verifyPass == password
+                },
+                label = {Text(text = "Re-enter password", color = Color.Black)},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Lock,
+                        contentDescription = null,
+                        tint = Color.Black
+                    )
+                }
+            )
+            if (!doPasswordsMatch){
+                Text(text = "Passwords do not match", color = Color.Red, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+            }
             Button(
                 onClick = {
                     val vendor = hashMapOf(
@@ -164,7 +189,7 @@ fun VendorSignUpForm()
                         }
                 },
                 enabled = email.isNotBlank()
-                        && password.isNotBlank(),
+                        && password.isNotBlank() &&verifyPass.isNotBlank() && doPasswordsMatch,
                 modifier = Modifier
                     .height(80.dp)
                     .width(250.dp)
@@ -177,7 +202,6 @@ fun VendorSignUpForm()
                     color = Color.Black
                 )
             }
-
             OutlinedButton(
                 onClick = {
                     context.startActivity(Intent(context, VendorLogIn::class.java))
