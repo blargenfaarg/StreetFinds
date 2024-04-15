@@ -52,7 +52,6 @@ class MapsComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SprintOneTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -218,7 +217,8 @@ fun LoadMap() {
 
 data class MarkerData(val position: LatLng, val title: String, val snippet: String)
 
-private fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
+private fun bitmapDescriptorFromVector(context: Context, vectorResId: Int): BitmapDescriptor
+{
     val vectorDrawable = ContextCompat.getDrawable(context, vectorResId)
     vectorDrawable!!.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
     val bitmap = Bitmap.createBitmap(

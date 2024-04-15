@@ -82,95 +82,100 @@ fun LoadGreeting()
         }
         context.startActivity(Intent(context, ListActivity::class.java))
     }
-    else {
-        // User is not logged in, show login screen
+    else
+    {
+        LogInScreen()
+    }
+}
+@Composable
+fun LogInScreen()
+{
+    val context = LocalContext.current
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
+    ) {
 
-        Surface(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            color = Color.White
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.truckpin),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(150.dp, 150.dp)
+            )
+            Text(
+                text = "StreetFinds",
+                textAlign = TextAlign.Center,
+                fontSize = 62.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(
+                modifier = Modifier.padding(10.dp)
+            )
+            Row {
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.truckpin),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(150.dp, 150.dp)
-                )
-                Text(
-                    text = "StreetFinds",
-                    textAlign = TextAlign.Center,
-                    fontSize = 62.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Spacer(
-                    modifier = Modifier.padding(10.dp)
-                )
-                Row {
-
-                    Button(
-                        onClick = {
-                            UserType.BUYER = true
-                            UserType.VENDOR = false
-                            UserType.GUEST = false
-                            context.startActivity(Intent(context, UserSignUp::class.java))
-                        },
-                        modifier = Modifier.width(130.dp)
-                    )
-                    {
-                        Text(
-                            text = "Users",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
-
-                    }
-                    Spacer(
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Button(
-                        onClick = {
-                            UserType.GUEST = false
-                            UserType.BUYER = false
-                            UserType.VENDOR = true
-                            context.startActivity(Intent(context, VendorSignUp::class.java))
-                        },
-                        modifier = Modifier.width(130.dp)
-                    )
-                    {
-                        Text(
-                            text = "Vendors",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
-
-                Divider(
-                    modifier = Modifier.padding(20.dp)
-                )
-
-                OutlinedButton(
+                Button(
                     onClick = {
-                        UserType.GUEST = true
-                        UserType.BUYER = false
+                        UserType.BUYER = true
                         UserType.VENDOR = false
-                        context.startActivity(Intent(context, ListActivity::class.java))
+                        UserType.GUEST = false
+                        context.startActivity(Intent(context, UserSignUp::class.java))
                     },
-                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                    modifier = Modifier.width(130.dp)
                 )
                 {
                     Text(
-                        text = "Continue as a guest",
-                        fontSize = 15.sp,
+                        text = "Users",
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    )
+
+                }
+                Spacer(
+                    modifier = Modifier.padding(16.dp)
+                )
+                Button(
+                    onClick = {
+                        UserType.GUEST = false
+                        UserType.BUYER = false
+                        UserType.VENDOR = true
+                        context.startActivity(Intent(context, VendorSignUp::class.java))
+                    },
+                    modifier = Modifier.width(130.dp)
+                )
+                {
+                    Text(
+                        text = "Vendors",
+                        fontSize = 20.sp,
                         color = Color.Black
                     )
                 }
+            }
+
+            Divider(
+                modifier = Modifier.padding(20.dp)
+            )
+
+            OutlinedButton(
+                onClick = {
+                    UserType.GUEST = true
+                    UserType.BUYER = false
+                    UserType.VENDOR = false
+                    context.startActivity(Intent(context, ListActivity::class.java))
+                },
+                colors = ButtonDefaults.buttonColors(Color.LightGray)
+            )
+            {
+                Text(
+                    text = "Continue as a guest",
+                    fontSize = 15.sp,
+                    color = Color.Black
+                )
             }
         }
     }
