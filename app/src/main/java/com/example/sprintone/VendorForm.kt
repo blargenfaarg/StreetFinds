@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,6 +54,7 @@ class VendorForm : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Red
                 ) {
+
                     LoadVendorForm()
                 }
             }
@@ -56,6 +62,7 @@ class VendorForm : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LoadVendorForm()
@@ -72,6 +79,7 @@ fun LoadVendorForm()
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     var isPhoneValid by remember { mutableStateOf(true) }
+    var selectedText by remember { mutableStateOf("Type")}
 
     var truckMondayHours by remember { mutableStateOf("") }
     var truckTuesdayHours by remember { mutableStateOf("") }
@@ -89,6 +97,7 @@ fun LoadVendorForm()
     var dialogSaturdayHours by remember { mutableStateOf("") }
     var dialogSundayHours by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false)}
+    var expanded by remember { mutableStateOf(false)}
 
     val db = Firebase.firestore
     val coroutineScope = rememberCoroutineScope()
@@ -150,16 +159,53 @@ fun LoadVendorForm()
                 label = { Text("Description") },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(40.dp)
                     .padding(4.dp)
             )
-            OutlinedTextField(
-                value = truckType,
-                onValueChange = { truckType = it },
-                label = { Text("Type") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            )
+            ExposedDropdownMenuBox(expanded = expanded,
+                onExpandedChange = {expanded = !expanded},
+                modifier = Modifier.fillMaxWidth().padding(4.dp))
+            {
+                OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
+                    DropdownMenuItem(text = {Text("American")},
+                        onClick = {
+                            truckType = "American"
+                            selectedText = truckType
+                            expanded = false
+                    })
+                    DropdownMenuItem(text = {Text("Mexican")},
+                        onClick = {
+                            truckType = "Mexican"
+                            selectedText = truckType
+                            expanded = false
+                        })
+                    DropdownMenuItem(text = {Text("Fusion")},
+                        onClick = {
+                            truckType = "Fusion"
+                            selectedText = truckType
+                            expanded = false
+                        })
+                    DropdownMenuItem(text = {Text("Asian")},
+                        onClick = {
+                            truckType = "Asian"
+                            selectedText = truckType
+                            expanded = false
+                        })
+                    DropdownMenuItem(text = {Text("Seafood")},
+                        onClick = {
+                            truckType = "Seafood"
+                            selectedText = truckType
+                            expanded = false
+                        })
+                    DropdownMenuItem(text = {Text("Breakfast")},
+                        onClick = {
+                            truckType = "Breakfast"
+                            selectedText = truckType
+                            expanded = false
+                        })
+                }
+            }
             OutlinedTextField(
                 value = truckLocation,
                 onValueChange = { truckLocation = it },
@@ -218,43 +264,57 @@ fun LoadVendorForm()
                             value = dialogMondayHours,
                             onValueChange = { dialogMondayHours = it },
                             label = { Text("Monday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogTuesdayHours,
                             onValueChange = { dialogTuesdayHours = it },
                             label = { Text("Tuesday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogWednesdayHours,
                             onValueChange = { dialogWednesdayHours = it },
                             label = { Text("Wednesday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogThursdayHours,
                             onValueChange = { dialogThursdayHours = it },
                             label = { Text("Thursday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogFridayHours,
                             onValueChange = { dialogFridayHours = it },
                             label = { Text("Friday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogSaturdayHours,
                             onValueChange = { dialogSaturdayHours = it },
                             label = { Text("Saturday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                         OutlinedTextField(
                             value = dialogSundayHours,
                             onValueChange = { dialogSundayHours = it },
                             label = { Text("Sunday") },
-                            modifier = Modifier.fillMaxWidth().padding(4.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         )
                     } }
                     )

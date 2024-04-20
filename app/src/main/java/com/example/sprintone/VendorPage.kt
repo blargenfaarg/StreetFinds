@@ -77,7 +77,6 @@ fun VendorGreeting()
     val context = LocalContext.current
     val db = Firebase.firestore
     val email = getUserEmail(context)
-    Log.e("Error", "Email is: $email")
     val scrollState = rememberScrollState()
 
     var businessName by remember { mutableStateOf("")}
@@ -106,7 +105,6 @@ fun VendorGreeting()
     var saturdayHoursWereChanged by remember { mutableStateOf(false)}
     var sundayHoursWereChanged by remember { mutableStateOf(false)}
     var wereHoursUpdated by remember{ mutableStateOf(false)}
-
 
     var truckMondayHours by remember { mutableStateOf("") }
     var truckTuesdayHours by remember { mutableStateOf("") }
@@ -623,17 +621,20 @@ fun VendorGreeting()
 
             Spacer(modifier = Modifier.padding(30.dp))
 
-            Text(text = "To list your business, please fill out the vendor form.", fontSize = 20.sp)
 
-            Spacer(modifier = Modifier.padding(10.dp))
+                Text(text = "To list your business, please fill out the vendor form.", fontSize = 20.sp)
 
-            Button(onClick = {context.startActivity(Intent(context, VendorForm::class.java))})
-            {
-                Text(
-                    text = "Vendor Form",
-                    fontSize = 30.sp
-                )
-            }
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Button(onClick = {context.startActivity(Intent(context, VendorForm::class.java))})
+                {
+                    Text(
+                        text = "Vendor Form",
+                        fontSize = 30.sp
+                    )
+                }
+
+
 
             Spacer(modifier = Modifier.padding(20.dp))
 
