@@ -30,7 +30,7 @@ import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadSearchBar() {
+fun LoadSearchBar(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     var sentToMap by remember { mutableStateOf(false) }
