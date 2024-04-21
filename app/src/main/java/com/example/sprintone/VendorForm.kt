@@ -159,7 +159,7 @@ fun LoadVendorForm()
                 label = { Text("Description") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(150.dp)
                     .padding(4.dp)
             )
             ExposedDropdownMenuBox(expanded = expanded,
