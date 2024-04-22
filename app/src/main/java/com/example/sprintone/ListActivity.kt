@@ -10,22 +10,21 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -35,16 +34,13 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,7 +50,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
@@ -119,7 +114,6 @@ fun DisplayList() {
     val day = dateFormat.format(calendar.time)
     val context = LocalContext.current
 
-
    LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
         try {
@@ -154,6 +148,7 @@ fun DisplayList() {
             Log.e(TAG, "Error getting documents: ", e)
         }
     }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,
@@ -176,35 +171,17 @@ fun DisplayList() {
                 )
             } // HEADER "StreetFinds" + Logo
             Divider(modifier = Modifier.padding(2.dp))
-
-            selectedTruckType.value?.let { selectedType ->
-                Text(
-                    text = "Filter is set to: $selectedType",
-                    modifier = Modifier.padding(10.dp),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            LazyRow(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                item {  FilterButton("Mexican", selectedTruckType)}
+            LazyRow(horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth())
+            {
                 item {  FilterButton("American", selectedTruckType)}
+                item {  FilterButton("Breakfast", selectedTruckType)}
+                item {  FilterButton("Mexican", selectedTruckType)}
                 item {  FilterButton("Italian", selectedTruckType)}
+                item {  FilterButton("Asian", selectedTruckType)}
                 item {  FilterButton("Fusion", selectedTruckType)}
                 item {  FilterButton("Seafood", selectedTruckType)}
             }
-                Button(
-                    onClick = { selectedTruckType.value = null },
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = "Clear Filter")
-                }
-
-
-
             truckListState.value.filter { truck ->
                 selectedTruckType.value == null || truck.type == selectedTruckType.value
             }.forEach { truck ->
@@ -213,17 +190,13 @@ fun DisplayList() {
                     .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 5.dp)
                     .align(Alignment.CenterHorizontally),
                     onClick = {
-
                         val intent = Intent(context, VendorProfilePage::class.java)
                         intent.putExtra("name", truck.name)
                         intent.putExtra("description", truck.description)
                         intent.putExtra("type", truck.type)
                         intent.putExtra("location", truck.location)
                         intent.putExtra("colorVal", randomNumber)
-
                         context.startActivity(intent)
-
-
                     })
                 {
                     Row(modifier = Modifier.fillMaxWidth()){
@@ -231,8 +204,11 @@ fun DisplayList() {
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .padding(start = 8.dp),
-                            colors = CardDefaults.outlinedCardColors(Color.hsl(randomNumber.toFloat(), 0.5f, 0.92f)),
-                        ) {
+                            colors = CardDefaults
+                                .outlinedCardColors(Color
+                                    .hsl(randomNumber
+                                        .toFloat(), 0.5f, 0.92f)))
+                        {
                             Icon(
                                 painter = painterResource(R.drawable.icon_foodtruck),
                                 contentDescription = "A food truck",
@@ -306,20 +282,28 @@ fun GenerateDayText(day: String, hours: String, modifier: Modifier)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterButton(type: String, selectedTruckType: MutableState<String?>) {
-    var selected by remember{ mutableStateOf(false)
-    }
+fun FilterButton(type: String, selectedTruckType: MutableState<String?>)
+{
+    val selected = selectedTruckType.value == type
 
     ElevatedFilterChip(
-        onClick = { selectedTruckType.value = type
-            selected = !selected
+        onClick = {
+            if (selectedTruckType.value == type) {
+                selectedTruckType.value = null // Deselect if this type is already selected
+            } else {
+                selectedTruckType.value = type // Select this type
+            }
                   },
+        leadingIcon = { if(selected) {Icon(imageVector = Icons.Filled.Done, contentDescription = null,
+            modifier = Modifier.size(FilterChipDefaults.IconSize))} },
         modifier = Modifier.padding(start = 4.dp, end = 4.dp),
         colors = FilterChipDefaults.elevatedFilterChipColors(),
         label ={ Text(type, color = Color.Black) } ,
-        selected = false)
+        selected = selected)
 
 }
+
+
 
 
 

@@ -55,9 +55,6 @@ fun LoadNavBar() {
                     else if (UserType.VENDOR) {
                         context.startActivity(Intent(context, VendorPage::class.java))
                     }
-                    else{
-                        Log.e("HEYY LOOK AGAIN", "Button Clicked. ")
-                    }
                 }
             )
     }

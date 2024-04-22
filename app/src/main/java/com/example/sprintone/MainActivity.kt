@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +51,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity()
 {
@@ -95,95 +103,100 @@ fun LoadGreeting()
         }
         context.startActivity(Intent(context, ListActivity::class.java))
     }
-    else {
-        // User is not logged in, show login screen
+    else
+    {
+        LogInScreen()
+    }
+}
+@Composable
+fun LogInScreen()
+{
+    val context = LocalContext.current
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
+    ) {
 
-        Surface(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            color = Color.White
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.truckpin),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(150.dp, 150.dp)
+            )
+            Text(
+                text = "StreetFinds",
+                textAlign = TextAlign.Center,
+                fontSize = 62.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(
+                modifier = Modifier.padding(10.dp)
+            )
+            Row {
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.truckpin),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(150.dp, 150.dp)
-                )
-                Text(
-                    text = "StreetFinds",
-                    textAlign = TextAlign.Center,
-                    fontSize = 62.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Spacer(
-                    modifier = Modifier.padding(10.dp)
-                )
-                Row {
-
-                    Button(
-                        onClick = {
-                            UserType.BUYER = true
-                            UserType.VENDOR = false
-                            UserType.GUEST = false
-                            context.startActivity(Intent(context, UserSignUp::class.java))
-                        },
-                        modifier = Modifier.width(130.dp)
-                    )
-                    {
-                        Text(
-                            text = "Users",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
-
-                    }
-                    Spacer(
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Button(
-                        onClick = {
-                            UserType.GUEST = false
-                            UserType.BUYER = false
-                            UserType.VENDOR = true
-                            context.startActivity(Intent(context, VendorSignUp::class.java))
-                        },
-                        modifier = Modifier.width(130.dp)
-                    )
-                    {
-                        Text(
-                            text = "Vendors",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
-
-                Divider(
-                    modifier = Modifier.padding(20.dp)
-                )
-
-                OutlinedButton(
+                Button(
                     onClick = {
-                        UserType.GUEST = true
-                        UserType.BUYER = false
+                        UserType.BUYER = true
                         UserType.VENDOR = false
-                        context.startActivity(Intent(context, ListActivity::class.java))
+                        UserType.GUEST = false
+                        context.startActivity(Intent(context, UserSignUp::class.java))
                     },
-                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                    modifier = Modifier.width(130.dp)
                 )
                 {
                     Text(
-                        text = "Continue as a guest",
-                        fontSize = 15.sp,
+                        text = "Users",
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    )
+
+                }
+                Spacer(
+                    modifier = Modifier.padding(16.dp)
+                )
+                Button(
+                    onClick = {
+                        UserType.GUEST = false
+                        UserType.BUYER = false
+                        UserType.VENDOR = true
+                        context.startActivity(Intent(context, VendorSignUp::class.java))
+                    },
+                    modifier = Modifier.width(130.dp)
+                )
+                {
+                    Text(
+                        text = "Vendors",
+                        fontSize = 20.sp,
                         color = Color.Black
                     )
                 }
+            }
+
+            Divider(
+                modifier = Modifier.padding(20.dp)
+            )
+
+            OutlinedButton(
+                onClick = {
+                    UserType.GUEST = true
+                    UserType.BUYER = false
+                    UserType.VENDOR = false
+                    context.startActivity(Intent(context, ListActivity::class.java))
+                },
+                colors = ButtonDefaults.buttonColors(Color.LightGray)
+            )
+            {
+                Text(
+                    text = "Continue as a guest",
+                    fontSize = 15.sp,
+                    color = Color.Black
+                )
             }
         }
     }
@@ -195,6 +208,12 @@ fun PickImageFromGallery()
     var imageUri by remember { mutableStateOf<Uri?>(null)}
     val context = LocalContext.current
     val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val storage = Firebase.storage
+    val storageRef = storage.reference
+    val scope = rememberCoroutineScope()
+    var uploadProgress by remember { mutableStateOf(0f) }
+    var uploadStatus by remember { mutableStateOf("") }
+
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ uri: Uri? ->
         imageUri = uri
@@ -205,18 +224,16 @@ fun PickImageFromGallery()
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         imageUri?.let {
             if (Build.VERSION.SDK_INT < 28)
             {
-                bitmap.value = MediaStore.Images
-                    .Media.getBitmap(context.contentResolver, it)
-            }  else
+                bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+            }
+            else
             {
                 val source = ImageDecoder.createSource(context.contentResolver, it)
                 bitmap.value = ImageDecoder.decodeBitmap(source)
             }
-
             bitmap.value?.let { btm ->
                 Image(
                     bitmap = btm.asImageBitmap(),
@@ -225,15 +242,54 @@ fun PickImageFromGallery()
                         .size(400.dp)
                         .padding(20.dp)
                 )
-
             }
         }
-
         Spacer(modifier = Modifier.height(12.dp))
-
         Button(onClick = { launcher.launch("image/*") })
         {
             Text(text="Pick Image")
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        if (imageUri != null) {
+            Button(onClick = { uploadImageToFirebaseStorage(imageUri!!, storageRef, scope, { progress ->
+                uploadProgress = progress
+            }, { status ->
+                uploadStatus = status
+            }) }) {
+                Text("Upload Image")
+            }
+        }
+        if (uploadProgress > 0) {
+            LinearProgressIndicator(progress = uploadProgress, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Upload Progress: ${uploadProgress * 100}%")
+        }
+        Text(uploadStatus)
+    }
+}
+
+fun uploadImageToFirebaseStorage(
+    fileUri: Uri,
+    storageRef: StorageReference,
+    scope: CoroutineScope,
+    onProgress: (Float) -> Unit,
+    onStatus: (String) -> Unit
+) {
+    val fileRef = storageRef.child("uploads/${fileUri.lastPathSegment}")
+    val uploadTask = fileRef.putFile(fileUri)
+
+    uploadTask.addOnProgressListener { taskSnapshot ->
+        val progress = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+        scope.launch {
+            onProgress(progress.toFloat() / 100.0f)
+        }
+    }.addOnFailureListener {
+        scope.launch {
+            onStatus("Upload failed: ${it.message}")
+        }
+    }.addOnSuccessListener {
+        scope.launch {
+            onStatus("Upload successful!")
         }
     }
 }
