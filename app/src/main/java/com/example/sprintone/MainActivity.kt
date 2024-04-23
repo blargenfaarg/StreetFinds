@@ -265,6 +265,7 @@ fun PickImageFromGallery()
             Text("Upload Progress: ${uploadProgress * 100}%")
         }
         Text(uploadStatus)
+
     }
 }
 
