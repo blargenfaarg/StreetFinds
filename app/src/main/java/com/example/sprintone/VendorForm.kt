@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -286,7 +287,12 @@ fun LoadVendorForm()
 
                     }){Text("Cancel")} },
                     text = {
-                        Column(){
+                        Column(horizontalAlignment = Alignment.CenterHorizontally){
+                            Row()
+                            {
+                                Text("Opening Hours", modifier = Modifier.padding(end = 8.dp), fontWeight = FontWeight.Bold)
+                                Text("Closing Hours", modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
+                            }
                             WeeklyBusinessHours(truckHours = truckHours, updateHours) } } )
             }
             Button(
@@ -372,6 +378,7 @@ fun WeeklyBusinessHours(truckHours: MutableState<Map<String, MutableState<Pair<S
             val dayHours = truckHours.value[day]!!
             val openingHours = remember { mutableStateOf(dayHours.value.first) }
             val closingHours = remember { mutableStateOf(dayHours.value.second) }
+
             DayTimePicker(day, openingHours, closingHours) { formattedHours ->
                 formattedHoursMap[day] = formattedHours
                 onUpdateHours(day, formattedHours)
@@ -389,11 +396,12 @@ fun DayTimePicker(day: String,
                   )
 {
     var formattedHours by remember { mutableStateOf("")}
-    Row(modifier = Modifier.fillMaxWidth())
-    {
-        TimeInputField(day, "Opening", openingHours)
-        TimeInputField(day, "Closing", closingHours)
-    }
+        Row(modifier = Modifier.fillMaxWidth())
+        {
+            TimeInputField(day, "Opening", openingHours)
+            TimeInputField(day, "Closing", closingHours)
+        }
+
 
     LaunchedEffect(openingHours.value, closingHours.value) {
         if (openingHours.value.isNotEmpty() && closingHours.value.isNotEmpty()) {
@@ -411,17 +419,24 @@ fun TimeInputField(day: String, label: String, timeState: MutableState<String>)
     val timePickerState = rememberTimePickerState()
     val isEnabled = remember { mutableStateOf(false)}
 
-    OutlinedTextField(
-        value = timeState.value,
-        onValueChange = {},
-        enabled= isEnabled.value,
-        label = { Text(text = day) },
-        modifier = Modifier
-            .width(135.dp)
-            .height(75.dp)
-            .clickable {
-                showDialog.value = true
-                isEnabled.value = false })
+    Box(modifier = Modifier
+        .width(135.dp)
+        .height(67.5.dp)
+        .padding(2.dp)
+        .clickable {
+            isEnabled.value = true
+            showDialog.value = true
+        }) {
+        OutlinedTextField(
+            value = timeState.value,
+            onValueChange = {},
+            enabled = isEnabled.value,
+            label = {
+                Text(text = "$day $label", color = Color.Gray, fontSize = 14.sp, lineHeight = 12.sp)
+                    },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 
     if (showDialog.value)
     {
