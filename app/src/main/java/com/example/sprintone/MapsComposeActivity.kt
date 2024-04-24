@@ -263,7 +263,7 @@ fun MapFilterContainer(onFilterSelected: (Float) -> Unit) {
                 selectedFilter?.let { onFilterSelected(it) }
             }) }
         item { MapFilterButton(
-            label = "1 mi", distance = 1609.34f, isSelected = 2500.0f == selectedFilter,
+            label = "1 mi", distance = 1609.34f, isSelected = 1609.34f == selectedFilter,
             onSelect = {distance ->
                 if (selectedFilter == distance) { selectedFilter = 9999999.0f }
                 else { selectedFilter = distance }

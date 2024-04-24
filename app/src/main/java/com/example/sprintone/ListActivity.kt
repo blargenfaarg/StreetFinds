@@ -99,7 +99,8 @@ data class Truck(
     val fridayHours : String,
     val saturdayHours : String,
     val sundayHours : String,
-)
+    val isFavorite: Boolean,
+    )
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,6 +114,7 @@ fun DisplayList() {
     val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
     val day = dateFormat.format(calendar.time)
     val context = LocalContext.current
+    val selectedFavorite = remember { mutableStateOf(false) }
 
    LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
@@ -123,6 +125,7 @@ fun DisplayList() {
                 val location = document.getString("Location")
                 val description = document.getString("Description")
                 val type = document.getString("Type")
+                val isFavorite = document.getBoolean("Favorite") ?: false
                 val truckMondayHours = document.getString("Monday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
                 val truckTuesdayHours = document.getString("Tuesday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
                 val truckWednesdayHours = document.getString("Wednesday Hours")?.takeIf { it.isNotBlank() } ?: "Closed"
@@ -138,7 +141,7 @@ fun DisplayList() {
                         truckThursdayHours,
                         truckFridayHours,
                         truckSaturdayHours,
-                        truckSundayHours)
+                        truckSundayHours, isFavorite)
                 } else {
                     null
                 }
@@ -181,9 +184,11 @@ fun DisplayList() {
                 item {  FilterButton("Asian", selectedTruckType)}
                 item {  FilterButton("Fusion", selectedTruckType)}
                 item {  FilterButton("Seafood", selectedTruckType)}
+                item {  FavoriteFilterButton(selectedFavorite)}
+
             }
             truckListState.value.filter { truck ->
-                selectedTruckType.value == null || truck.type == selectedTruckType.value
+                (selectedTruckType.value == null || truck.type == selectedTruckType.value)
             }.forEach { truck ->
                 val randomNumber = (50..360).random()
                 Card(modifier = Modifier
@@ -231,6 +236,7 @@ fun DisplayList() {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = truck.location,
+                                    lineHeight = 16.sp,
                                     modifier = Modifier
                                 )
                             }
@@ -245,7 +251,7 @@ fun DisplayList() {
                                 when(day){
                                     "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier.align(Alignment.CenterVertically))
                                     "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                    "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier)
                                     "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier.align(Alignment.CenterVertically))
                                     "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier.align(Alignment.CenterVertically))
                                     "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier.align(Alignment.CenterVertically))
@@ -268,13 +274,17 @@ fun GenerateDayText(day: String, hours: String, modifier: Modifier)
     {
         Row(modifier = Modifier.padding(start=4.dp))
         {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column() {
                 Text(
                     modifier = modifier,
-                    text = "$day Hours: $hours",
+                    text = "$day Hours:",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Text(text = hours,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Black,
+                    )
             }
         }
     }
@@ -301,6 +311,29 @@ fun FilterButton(type: String, selectedTruckType: MutableState<String?>)
         label ={ Text(type, color = Color.Black) } ,
         selected = selected)
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FavoriteFilterButton(selectedFavorite: MutableState<Boolean>) {
+    ElevatedFilterChip(
+        onClick = {
+            selectedFavorite.value = !selectedFavorite.value // Toggle favorite filter on click
+        },
+        leadingIcon = {
+            if (selectedFavorite.value) {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        },
+        modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+        colors = FilterChipDefaults.elevatedFilterChipColors(),
+        label = { Text("Favorite", color = Color.Black) },
+        selected = selectedFavorite.value
+    )
 }
 
 

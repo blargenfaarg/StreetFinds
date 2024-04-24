@@ -331,3 +331,17 @@ fun getUserEmail(context: Context): String? {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     return sharedPreferences.getString("email", null)
 }
+
+fun saveUserFavorites(context: Context, favorites: List<String>) {
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putStringSet("favorites", favorites.toSet())
+    editor.apply()
+}
+
+fun getUserFavorites(context: Context): Set<String>
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val favorites = sharedPreferences.getStringSet("favorites", emptySet())
+    return favorites ?: emptySet()
+}

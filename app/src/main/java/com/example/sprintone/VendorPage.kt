@@ -19,6 +19,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -67,6 +70,7 @@ class VendorPage : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @Preview
@@ -95,6 +99,8 @@ fun VendorGreeting()
     var locationWasChanged by remember { mutableStateOf(false)}
     var typeWasChanged by remember { mutableStateOf(false)}
     var wereHoursUpdated by remember{ mutableStateOf(false)}
+    var expanded by remember { mutableStateOf(false)}
+    var selectedText by remember { mutableStateOf("New Type")}
 
     var truckMondayHours = remember { mutableStateOf("Closed") }
     var truckTuesdayHours = remember { mutableStateOf("Closed") }
@@ -232,7 +238,7 @@ fun VendorGreeting()
                     Text("Update Vendor Info")
                 }
 
-                PickImageFromGallery()
+                //PickImageFromGallery()
 
                 if (showDialog)
                 {
@@ -249,11 +255,11 @@ fun VendorGreeting()
                                                 val vendorDoc = documents.documents.first()
                                                 val vendorId = vendorDoc.id
                                                 db.collection("trucks").document(vendorId).update("Name", newBusinessName)
-
                                                 businessName = newBusinessName
                                             }
                                         }
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
+
+                                    db.collection("vendors").whereEqualTo("Business Name", businessName)
                                         .get()
                                         .addOnSuccessListener { documents ->
                                             if (!documents.isEmpty) {
@@ -354,10 +360,10 @@ fun VendorGreeting()
                                         newBusinessName = it
                                         if (newBusinessName != businessName)
                                         {
-                                            nameWasChanged = false
+                                            nameWasChanged = true
                                         }
                                         else{
-                                            nameWasChanged = true
+                                            nameWasChanged = false
                                         }
                                                     },
                                     label = { Text("New Name") },
@@ -365,22 +371,76 @@ fun VendorGreeting()
                                         .fillMaxWidth()
                                         .padding(4.dp)
                                 )
-                                OutlinedTextField(
-                                    value = newBusinessType,
-                                    onValueChange = { newBusinessType = it
-                                        if (newBusinessType == businessType)
-                                        {
 
-                                        }
-                                        else {
-                                            typeWasChanged = true
-                                        }
-                                    },
-                                    label = { Text("New Type") },
+                                ExposedDropdownMenuBox(expanded = expanded,
+                                    onExpandedChange = {expanded = !expanded},
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(4.dp)
-                                )
+                                        .padding(4.dp))
+                                {
+                                    OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier=Modifier
+                                        .menuAnchor()
+                                        .fillMaxWidth())
+                                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
+                                        DropdownMenuItem(text = {Text("American")},
+                                            onClick = {
+                                                newBusinessType = "American"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Mexican")},
+                                            onClick = {
+                                                newBusinessType = "Mexican"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Fusion")},
+                                            onClick = {
+                                                newBusinessType = "Fusion"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Asian")},
+                                            onClick = {
+                                                newBusinessType = "Asian"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Seafood")},
+                                            onClick = {
+                                                newBusinessType = "Seafood"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Breakfast")},
+                                            onClick = {
+                                                newBusinessType = "Breakfast"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                        DropdownMenuItem(text = {Text("Italian")},
+                                            onClick = {
+                                                newBusinessType = "Italian"
+                                                selectedText = newBusinessType
+                                                expanded = false
+                                                typeWasChanged = true
+
+                                            })
+                                    }
+                                }
+
                                 OutlinedTextField(
                                     value = newBusinessDescription,
                                     onValueChange = {
