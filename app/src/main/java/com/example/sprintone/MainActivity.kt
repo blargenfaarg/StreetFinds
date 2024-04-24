@@ -205,7 +205,7 @@ fun LogInScreen()
 @Composable
 fun PickImageFromGallery()
 {
-    var imageUri by remember { mutableStateOf<Uri?>(null)}
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val bitmap = remember { mutableStateOf<Bitmap?>(null) }
     val storage = Firebase.storage

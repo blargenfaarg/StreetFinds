@@ -15,6 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -174,7 +180,7 @@ fun LoadVendorProfilePage(name:String, description:String, type:String, location
                 OutlinedCard(modifier = Modifier
                     .width(500.dp)
                     .height(200.dp),
-                    colors = CardDefaults.outlinedCardColors(Color.LightGray) )
+                    colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f,.96f,.74f)) )
                     {
                     Column(modifier = Modifier
                         .fillMaxSize()
@@ -197,26 +203,48 @@ fun LoadVendorProfilePage(name:String, description:String, type:String, location
                                 )
                             }
                             Column {
-                                Text(text = name, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp))
-                                Text(text = type, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp))
+                                Text(text = name, fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp),color=Color.Black)
+                                Text(text = type, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp),color=Color.Black)
                             }
                         }
                     }
                 }
                 OutlinedCard(modifier = Modifier.fillMaxWidth()) {
                     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth())
-                    {Text("Description", fontWeight = FontWeight.Bold, fontSize = 20.sp)}
+                    { Text("Description", fontWeight = FontWeight.Bold, fontSize = 20.sp)}
 
-                    Text(description, modifier = Modifier.padding(12.dp))
+                        Text(description, modifier = Modifier.padding(12.dp))
+
                 }
                 OutlinedCard(modifier = Modifier.fillMaxWidth())
                 {
-                    Text(location, modifier = Modifier.padding(12.dp))
+                    Row {
+                        Icon(
+                            imageVector = Icons.Filled.LocationOn,
+                            contentDescription = "A location Icon",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp)
+                        )
+                        Text(location, modifier = Modifier.padding(12.dp))
+                    }
                 }
                 OutlinedCard(modifier = Modifier.fillMaxWidth())
                 {
-                    truckListState.value.forEach() { truck ->
-                        Text(text = "Phone Number: ${truck.phoneNumber}", modifier = Modifier.padding(12.dp))
+                    Row {
+                        Icon(
+                            imageVector = Icons.Filled.Phone,
+                            contentDescription = "A phone Icon",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 8.dp)
+                        )
+                        truckListState.value.forEach() { truck ->
+                            Text(
+                                text = "Phone Number: ${truck.phoneNumber}",
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
                     }
                 }
 
@@ -224,6 +252,13 @@ fun LoadVendorProfilePage(name:String, description:String, type:String, location
                     .fillMaxWidth()
                     .padding(4.dp), horizontalArrangement = Arrangement.Center)
                 {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "A clock icon",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 8.dp)
+                    )
                     truckListState.value.forEach() { truck ->
                         when(day)
                         {
