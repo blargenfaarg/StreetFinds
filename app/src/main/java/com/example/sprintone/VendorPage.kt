@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -521,10 +524,9 @@ fun VendorGreeting()
                 }
             }
 
-            Spacer(modifier = Modifier.padding(30.dp))
-
             if (!hasEnteredBusiness)
             {
+                Spacer(modifier = Modifier.padding(30.dp))
                 Text(text = "To list your business, please fill out the vendor form.", fontSize = 20.sp)
                 Spacer(modifier = Modifier.padding(10.dp))
                 Button(onClick = {context.startActivity(Intent(context, VendorForm::class.java))})
@@ -534,18 +536,17 @@ fun VendorGreeting()
                 }
             }
 
-
-            Spacer(modifier = Modifier.padding(20.dp))
-
             Button(onClick = {
                 val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 editor.clear()
                 editor.apply()
                 context.startActivity(Intent(context, MainActivity::class.java)) },
-                modifier = Modifier.align(Alignment.End))
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .size(200.dp, 50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Gray) )
             {
-                Text("Sign out")
+                Text("Sign out", fontSize = 24.sp)
             }
         }
     }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
@@ -119,7 +120,8 @@ fun LoadUserProfile() {
                 },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .size(200.dp, 50.dp) )
+                        .size(200.dp, 50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray))
                 {
                     Text("Sign out", fontSize = 24.sp)
                 }
