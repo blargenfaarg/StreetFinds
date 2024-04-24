@@ -3,29 +3,42 @@ package com.example.sprintone
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerLayoutType
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,9 +65,7 @@ class VendorForm : ComponentActivity() {
             SprintOneTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Red
                 ) {
-
                     LoadVendorForm()
                 }
             }
@@ -81,28 +92,30 @@ fun LoadVendorForm()
     var isPhoneValid by remember { mutableStateOf(true) }
     var selectedText by remember { mutableStateOf("Type")}
 
-    var truckMondayHours by remember { mutableStateOf("") }
-    var truckTuesdayHours by remember { mutableStateOf("") }
-    var truckWednesdayHours by remember { mutableStateOf("") }
-    var truckThursdayHours by remember { mutableStateOf("") }
-    var truckFridayHours by remember { mutableStateOf("") }
-    var truckSaturdayHours by remember { mutableStateOf("") }
-    var truckSundayHours by remember { mutableStateOf("") }
+    val truckMondayHours = remember { mutableStateOf("Closed") }
+    val truckTuesdayHours = remember { mutableStateOf("Closed") }
+    val truckWednesdayHours = remember { mutableStateOf("Closed") }
+    val truckThursdayHours = remember { mutableStateOf("Closed") }
+    val truckFridayHours = remember { mutableStateOf("Closed") }
+    val truckSaturdayHours = remember { mutableStateOf("Closed") }
+    val truckSundayHours = remember { mutableStateOf("Closed") }
 
-    var dialogMondayHours by remember { mutableStateOf("") }
-    var dialogTuesdayHours by remember { mutableStateOf("") }
-    var dialogWednesdayHours by remember { mutableStateOf("") }
-    var dialogThursdayHours by remember { mutableStateOf("") }
-    var dialogFridayHours by remember { mutableStateOf("") }
-    var dialogSaturdayHours by remember { mutableStateOf("") }
-    var dialogSundayHours by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(false)}
+    val showHoursDialog = remember { mutableStateOf(false)}
+    val hasVendorEnteredHours = remember { mutableStateOf(false)}
     var expanded by remember { mutableStateOf(false)}
-
     val db = Firebase.firestore
     val coroutineScope = rememberCoroutineScope()
     val phoneNumberRegex = Regex("\\(\\d{3}\\)\\s\\d{3}-\\d{4}|\\d{10}")
 
+  val truckHours = remember { mutableStateOf(mapOf(
+      "Monday" to mutableStateOf(Pair("", "")),
+      "Tuesday" to mutableStateOf(Pair("", "")),
+      "Wednesday" to mutableStateOf(Pair("", "")),
+      "Thursday" to mutableStateOf(Pair("", "")),
+      "Friday" to mutableStateOf(Pair("", "")),
+      "Saturday" to mutableStateOf(Pair("", "")),
+      "Sunday" to mutableStateOf(Pair("", ""))
+      ))}
 
     Surface(color = Color.White, modifier = Modifier.fillMaxSize())
     {
@@ -148,7 +161,7 @@ fun LoadVendorForm()
             if (!isPhoneValid)
             {
                 Text(
-                    text = "Please enter a valid phone number (e.g. (123) 456-7890",
+                    text = "Please enter a valid phone number (e.g. (123) 456-7890)",
                     color = Color.Red,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                 )
@@ -160,13 +173,16 @@ fun LoadVendorForm()
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(4.dp)
-            )
+                    .padding(4.dp))
             ExposedDropdownMenuBox(expanded = expanded,
                 onExpandedChange = {expanded = !expanded},
-                modifier = Modifier.fillMaxWidth().padding(4.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp))
             {
-                OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier = Modifier.menuAnchor())
+                OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth())
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
                     DropdownMenuItem(text = {Text("American")},
                         onClick = {
@@ -204,6 +220,12 @@ fun LoadVendorForm()
                             selectedText = truckType
                             expanded = false
                         })
+                    DropdownMenuItem(text = {Text("Italian")},
+                        onClick = {
+                            truckType = "Italian"
+                            selectedText = truckType
+                            expanded = false
+                        })
                 }
             }
             OutlinedTextField(
@@ -219,107 +241,59 @@ fun LoadVendorForm()
                 modifier = Modifier.padding(top = 16.dp),
                 fontWeight = FontWeight.Bold
             )
-            Button(onClick = {showDialog = true})
+            Button(onClick = {showHoursDialog.value = true})
             {
                 Text("Input Business Hours")
             }
-
-            if (showDialog)
+            if (showHoursDialog.value)
             {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    confirmButton = {
-                        Button(onClick = {
-                        truckMondayHours = dialogMondayHours
-                        truckTuesdayHours = dialogTuesdayHours
-                        truckWednesdayHours = dialogWednesdayHours
-                        truckThursdayHours = dialogThursdayHours
-                        truckFridayHours = dialogFridayHours
-                        truckSaturdayHours = dialogSaturdayHours
-                        truckSundayHours = dialogSundayHours
-                        showDialog = false
-                    }, enabled = dialogMondayHours.isNotBlank()
-                                || dialogTuesdayHours.isNotBlank()
-                                || dialogWednesdayHours.isNotBlank()
-                                || dialogThursdayHours.isNotBlank()
-                                || dialogFridayHours.isNotBlank()
-                                || dialogSaturdayHours.isNotBlank()
-                                || dialogSundayHours.isNotBlank()
-                        )
-                        {
-                        Text("Save")
-                    } },
-                    dismissButton = {
-                                    Button(onClick = {
-                                        showDialog = false
-                                    }){
-                                        Text("Cancel")
-                                    }
-                    },
-                    title = {Text("Enter Business Hours")},
+                val updateHours = { day: String, hours: String ->
+                    when (day) {
+                        "Monday" -> truckMondayHours.value = hours
+                        "Tuesday" -> truckTuesdayHours.value = hours
+                        "Wednesday" -> truckWednesdayHours.value = hours
+                        "Thursday" -> truckThursdayHours.value = hours
+                        "Friday" -> truckFridayHours.value = hours
+                        "Saturday" -> truckSaturdayHours.value = hours
+                        "Sunday" -> truckSundayHours.value = hours
+                    }
+                }
+                AlertDialog(onDismissRequest = {
+                    truckMondayHours.value = "Closed"
+                    truckTuesdayHours.value = "Closed"
+                    truckWednesdayHours.value = "Closed"
+                    truckThursdayHours.value = "Closed"
+                    truckFridayHours.value = "Closed"
+                    truckSaturdayHours.value = "Closed"
+                    truckSundayHours.value = "Closed"
+                    showHoursDialog.value = false
+                                               },
+                    confirmButton = { Button(onClick =
+                    {
+                        showHoursDialog.value = false
+                        hasVendorEnteredHours.value = true
+                    })
+                    {Text("Add Hours")} },
+                    dismissButton = {Button(onClick = {
+                        truckMondayHours.value = "Closed"
+                        truckTuesdayHours.value = "Closed"
+                        truckWednesdayHours.value = "Closed"
+                        truckThursdayHours.value = "Closed"
+                        truckFridayHours.value = "Closed"
+                        truckSaturdayHours.value = "Closed"
+                        truckSundayHours.value = "Closed"
+                        showHoursDialog.value = false
+
+                    }){Text("Cancel")} },
                     text = {
-                        Column{
-
-                        OutlinedTextField(
-                            value = dialogMondayHours,
-                            onValueChange = { dialogMondayHours = it },
-                            label = { Text("Monday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogTuesdayHours,
-                            onValueChange = { dialogTuesdayHours = it },
-                            label = { Text("Tuesday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogWednesdayHours,
-                            onValueChange = { dialogWednesdayHours = it },
-                            label = { Text("Wednesday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogThursdayHours,
-                            onValueChange = { dialogThursdayHours = it },
-                            label = { Text("Thursday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogFridayHours,
-                            onValueChange = { dialogFridayHours = it },
-                            label = { Text("Friday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogSaturdayHours,
-                            onValueChange = { dialogSaturdayHours = it },
-                            label = { Text("Saturday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                        OutlinedTextField(
-                            value = dialogSundayHours,
-                            onValueChange = { dialogSundayHours = it },
-                            label = { Text("Sunday") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        )
-                    } }
-                    )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally){
+                            Row()
+                            {
+                                Text("Opening Hours", modifier = Modifier.padding(end = 8.dp), fontWeight = FontWeight.Bold)
+                                Text("Closing Hours", modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
+                            }
+                            WeeklyBusinessHours(truckHours = truckHours, updateHours) } } )
             }
-
             Button(
                 onClick = {
                     val truck = hashMapOf(
@@ -328,13 +302,13 @@ fun LoadVendorForm()
                         "Type" to truckType,
                         "Location" to truckLocation,
                         "Description" to truckDescription,
-                        "Monday Hours" to truckMondayHours,
-                        "Tuesday Hours" to truckTuesdayHours,
-                        "Wednesday Hours" to truckWednesdayHours,
-                        "Thursday Hours" to truckThursdayHours,
-                        "Friday Hours" to truckFridayHours,
-                        "Saturday Hours" to truckSaturdayHours,
-                        "Sunday Hours" to truckSundayHours,
+                        "Monday Hours" to truckMondayHours.value,
+                        "Tuesday Hours" to truckTuesdayHours.value,
+                        "Wednesday Hours" to truckWednesdayHours.value,
+                        "Thursday Hours" to truckThursdayHours.value,
+                        "Friday Hours" to truckFridayHours.value,
+                        "Saturday Hours" to truckSaturdayHours.value,
+                        "Sunday Hours" to truckSundayHours.value,
                     )
                     db.collection("trucks").whereEqualTo("Name", truckName)
                         .get()
@@ -367,12 +341,12 @@ fun LoadVendorForm()
                                 db.collection("vendors").document(vendorId).update("Business Name", truckName)
                             }
                         }
-
                 },
                 enabled = truckName.isNotBlank()
                         && truckDescription.isNotBlank()
                         && truckType.isNotBlank()
                         && truckLocation.isNotBlank()
+                        && hasVendorEnteredHours.value
             ) {
                 Text("Add Truck")
             }
@@ -392,4 +366,136 @@ fun LoadVendorForm()
             }
         }
     }
+}
+
+@Composable
+fun WeeklyBusinessHours(truckHours: MutableState<Map<String, MutableState<Pair<String, String>>>>,
+                        onUpdateHours:(String, String) -> Unit) {
+    val formattedHoursMap = remember { mutableStateMapOf<String, String>()}
+    Column {
+        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").forEach { day ->
+            val dayHours = truckHours.value[day]!!
+            val openingHours = remember { mutableStateOf(dayHours.value.first) }
+            val closingHours = remember { mutableStateOf(dayHours.value.second) }
+
+            DayTimePicker(day, openingHours, closingHours) { formattedHours ->
+                formattedHoursMap[day] = formattedHours
+                onUpdateHours(day, formattedHours)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DayTimePicker(day: String,
+                  openingHours: MutableState<String>,
+                  closingHours: MutableState<String>,
+                  onHoursFormatted: (String) -> Unit
+                  )
+{
+    var formattedHours by remember { mutableStateOf("")}
+        Row(modifier = Modifier.fillMaxWidth())
+        {
+            TimeInputField(day, "Opening", openingHours)
+            TimeInputField(day, "Closing", closingHours)
+        }
+
+
+    LaunchedEffect(openingHours.value, closingHours.value) {
+        if (openingHours.value.isNotEmpty() && closingHours.value.isNotEmpty()) {
+            formattedHours = formatBusinessHours(openingHours.value, closingHours.value)
+            onHoursFormatted(formattedHours)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeInputField(day: String, label: String, timeState: MutableState<String>)
+{
+    val showDialog = remember { mutableStateOf(false)}
+    val timePickerState = rememberTimePickerState()
+    val isEnabled = remember { mutableStateOf(false)}
+
+    Box(modifier = Modifier
+        .width(135.dp)
+        .height(67.5.dp)
+        .padding(2.dp)
+        .clickable {
+            isEnabled.value = true
+            showDialog.value = true
+        }) {
+        OutlinedTextField(
+            value = timeState.value,
+            onValueChange = {},
+            enabled = isEnabled.value,
+            label = {
+                Text(text = "$day $label", color = Color.Gray, fontSize = 14.sp, lineHeight = 12.sp)
+                    },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+
+    if (showDialog.value)
+    {
+        TimePickerDialog(
+            title = "Select $label Time",
+            timePickerState = timePickerState,
+            showDialog = showDialog)
+        {
+            selectedTime ->
+            timeState.value = selectedTime
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerDialog(
+    title: String,
+    timePickerState: TimePickerState,
+    showDialog: MutableState<Boolean>,
+    onTimeSelected: (String) -> Unit
+) {
+    if (showDialog.value)
+    {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(title) },
+            confirmButton = {
+                Button(onClick = {
+                showDialog.value = false
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {showDialog.value=false}) {
+                    Text("Cancel")
+                }
+            },
+            text = {
+                TimePicker(state = timePickerState, layoutType = TimePickerLayoutType.Vertical)
+                onTimeSelected(convertHours(timePickerState.hour, timePickerState.minute))
+            }
+        )
+    }
+}
+
+@Composable
+fun convertHours(hour: Int, minute: Int): String {
+    val hour12 = if (hour == 0 || hour == 12) 12 else hour % 12
+    val amPm = if (hour < 12) "AM" else "PM"
+
+    val formattedHour = hour12.toString().padStart(2, '0')
+    val formattedMinute = minute.toString().padStart(2, '0')
+
+    val finalString = "$formattedHour:$formattedMinute $amPm"
+
+    return finalString
+}
+
+fun formatBusinessHours(openingTime: String, closingTime: String): String {
+    return "$openingTime to $closingTime"
 }
