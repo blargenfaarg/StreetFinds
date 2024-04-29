@@ -2,6 +2,7 @@ package com.example.sprintone
 
 import android.content.ContentValues
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -303,6 +304,11 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                             text = "Phone Number: ${truck.phoneNumber}",
                             modifier = Modifier.padding(12.dp)
                         )
+                        Button(onClick = {
+                            val intent = Intent(Intent.ACTION_DIAL).apply{
+                                data = Uri.parse("tel:${truck.phoneNumber}")}
+                            context.startActivity(intent)
+                        }){Text("Dial")}
                     }
                 }
             }
