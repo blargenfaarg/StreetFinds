@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.RatingBar
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -56,6 +57,9 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.mutableIntStateOf
 
 class VendorProfilePage : ComponentActivity() {
 override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,13 +122,18 @@ override fun onCreate(savedInstanceState: Bundle?) {
                                     description.toString(), type.toString(), location.toString(), randomNumber)
                             }
                         }
+
+
                     }
+
                 }
+
             }
         }
     }
 }
 }
+
 
 
 data class TruckHours(
@@ -339,11 +348,41 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                     Text("Show on Map")
                 }
             }
+            var myRating by remember { mutableIntStateOf(0) }
+            RatingBar(
+                currentRating = myRating,
+                onRatingChanged = { myRating = it }
+            )
         }
+
+
+
+
     }
 }
 }
-
+@Composable
+fun RatingBar(
+    maxRating: Int = 5,
+    currentRating: Int,
+    onRatingChanged: (Int) -> Unit,
+    starsColor: Color = Color.Yellow
+) {
+    Row {
+        for (i in 1..maxRating) {
+            Icon(
+                imageVector = if (i <= currentRating) Icons.Filled.Star
+                else Icons.Default.Star,
+                contentDescription = null,
+                tint = if (i <= currentRating) starsColor
+                else Color.Unspecified,
+                modifier = Modifier
+                    .clickable { onRatingChanged(i) }
+                    .padding(4.dp)
+            )
+        }
+    }
+}
 
 
 
