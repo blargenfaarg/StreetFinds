@@ -259,7 +259,7 @@ fun PickImageFromGallery()
         Spacer(modifier = Modifier.height(12.dp))
         Button(onClick = { launcher.launch("image/*") })
         {
-            Text(text="Pick Image")
+            Text(text="Select Image")
         }
         Spacer(modifier = Modifier.height(12.dp))
         if (imageUri != null) {
@@ -283,9 +283,9 @@ fun PickImageFromGallery()
 
 fun saveImageUrlToFirestore(vendorId: String, imageUrl: String)
 {
+    Log.e("Vendor ID", "Vendor ID: $vendorId")
     val db = FirebaseFirestore.getInstance()
     val vendorRef = db.collection("vendors").document(vendorId)
-
     db.runTransaction { transaction ->
         val snapshot = transaction.get(vendorRef)
         val imageUris = snapshot.get("imageUrl") as? MutableList<String> ?: mutableListOf()
@@ -305,6 +305,7 @@ fun uploadImageToFirebaseStorage(fileUri: Uri, storageRef: StorageReference,
                                  onStatus: (String) -> Unit, context: Context
 ) {
     val vendorId = getVendorId(context)
+    Log.e("Upload Image To Firebase Storage: ", "vendorID: $vendorId")
     val fileRef = storageRef.child("uploads/$vendorId/${fileUri.lastPathSegment}")
     val uploadTask = fileRef.putFile(fileUri)
 

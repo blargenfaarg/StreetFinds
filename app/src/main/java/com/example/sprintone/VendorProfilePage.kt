@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -151,6 +153,7 @@ val isFavorite = remember { mutableStateOf(false)}
 val db = Firebase.firestore
 val userType = getUserType(context)
 var imageUrls by remember { mutableStateOf<List<String>?>(null) }
+var showDialog by remember { mutableStateOf(false)}
 
 
 
@@ -233,9 +236,13 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
     {
         Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(Color.LightGray))
         {
-            Card(modifier = Modifier.fillMaxWidth().height(125.dp))
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .height(125.dp))
                 {
-                Column(modifier = Modifier.fillMaxSize().padding(10.dp),
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
                     verticalArrangement = Arrangement.Bottom)
                 {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom)
@@ -284,7 +291,7 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                     }
                 }
             }
-            Divider(modifier=Modifier.padding(8.dp))
+            Divider(modifier=Modifier.padding(8.dp), thickness = 2.dp)
             Card(modifier = Modifier.fillMaxWidth())
             {
                 Row(modifier=Modifier.fillMaxWidth())
@@ -343,7 +350,9 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
 
             Spacer(modifier = Modifier.padding(2.dp))
 
-            Card(modifier = Modifier.fillMaxWidth())
+            Card(modifier = Modifier.fillMaxWidth(), onClick = {
+                showDialog = true
+            })
             {
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -374,7 +383,7 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                 }
             }
 
-            Spacer(modifier = Modifier.padding(2.dp))
+            Spacer(modifier = Modifier.padding(3.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
 
@@ -399,11 +408,33 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                 {
                     Box(modifier = Modifier.fillMaxSize())
                     {
-                        Log.e("EEEEEE", "imageUrls: $imageUrls")
                         LoadImageFromUrls(imageUrls = imageUrls!!)
                     }
                 }
            }
+            if (showDialog)
+            {
+                AlertDialog(onDismissRequest = { showDialog = false }, confirmButton = {
+                    Button(onClick = {showDialog = false})
+                    {
+                        Text("Close")
+                    }},
+                    text = {
+                        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text("Hours for This Week:")
+                            truckListState.value.forEach() { truck ->
+                                GenerateDayText("Monday", truck.mondayHours)
+                                GenerateDayText("Tuesday", truck.tuesdayHours)
+                                GenerateDayText("Wednesday", truck.wednesdayHours)
+                                GenerateDayText("Thursday", truck.thursdayHours)
+                                GenerateDayText("Friday", truck.fridayHours)
+                                GenerateDayText("Saturday", truck.saturdayHours)
+                                GenerateDayText("Sunday", truck.sundayHours)
+                            }
+                        }
+                    })
+            }
         }
     }
   }

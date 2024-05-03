@@ -2,6 +2,7 @@ package com.example.sprintone
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class VendorLogIn : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,6 +129,9 @@ fun VendorLogInScreen()
                                     if (storedPassword == password)
                                     {
                                         successMessage = "Success! Logging in..."
+                                        val vendorId = vendorDocument.id
+                                        Log.e("VendorLogin: ", "VendorId: $vendorId")
+                                        saveVendorId(context, vendorId)
                                         saveUserLoggedInState(context, true)
                                         saveUserType(context, "vendor")
                                         saveUserEmail(context, email)
