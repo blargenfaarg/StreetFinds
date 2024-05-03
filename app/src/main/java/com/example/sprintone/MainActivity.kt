@@ -3,11 +3,13 @@ package com.example.sprintone
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -15,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +27,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -43,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,13 +57,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MainActivity : ComponentActivity()
 {
@@ -255,7 +267,7 @@ fun PickImageFromGallery()
                 uploadProgress = progress
             }, { status ->
                 uploadStatus = status
-            }) }) {
+            }, context) }) {
                 Text("Upload Image")
             }
         }
@@ -269,14 +281,31 @@ fun PickImageFromGallery()
     }
 }
 
-fun uploadImageToFirebaseStorage(
-    fileUri: Uri,
-    storageRef: StorageReference,
-    scope: CoroutineScope,
-    onProgress: (Float) -> Unit,
-    onStatus: (String) -> Unit
+fun saveImageUrlToFirestore(vendorId: String, imageUrl: String)
+{
+    val db = FirebaseFirestore.getInstance()
+    val vendorRef = db.collection("vendors").document(vendorId)
+
+    db.runTransaction { transaction ->
+        val snapshot = transaction.get(vendorRef)
+        val imageUris = snapshot.get("imageUrl") as? MutableList<String> ?: mutableListOf()
+        imageUris.add(imageUrl)
+        transaction.update(vendorRef, "imageUrl", imageUris)
+        null
+    }.addOnSuccessListener {
+        println("Image URI added to vendor profile successfully!")
+    }.addOnFailureListener { e ->
+        println("Transaction failure: $e")
+    }
+}
+
+fun uploadImageToFirebaseStorage(fileUri: Uri, storageRef: StorageReference,
+                                 scope: CoroutineScope,
+                                 onProgress: (Float) -> Unit,
+                                 onStatus: (String) -> Unit, context: Context
 ) {
-    val fileRef = storageRef.child("uploads/${fileUri.lastPathSegment}")
+    val vendorId = getVendorId(context)
+    val fileRef = storageRef.child("uploads/$vendorId/${fileUri.lastPathSegment}")
     val uploadTask = fileRef.putFile(fileUri)
 
     uploadTask.addOnProgressListener { taskSnapshot ->
@@ -288,12 +317,45 @@ fun uploadImageToFirebaseStorage(
         scope.launch {
             onStatus("Upload failed: ${it.message}")
         }
-    }.addOnSuccessListener {
+    }.addOnSuccessListener { taskSnapshot ->
+        fileRef.downloadUrl.addOnSuccessListener { uri ->
+            val imageUrl = uri.toString()
+            saveImageUrlToFirestore(vendorId.toString(), imageUrl)
+        }
         scope.launch {
             onStatus("Upload successful!")
         }
     }
 }
+
+@Composable
+fun LoadImageFromUrls(imageUrls: List<String>) {
+    LazyRow(modifier = Modifier.fillMaxWidth()) {
+        items(imageUrls) { imageUrl ->
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = imageUrl)
+                    .apply {
+                        crossfade(true)
+                    }
+                    .build()
+            )
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .width(200.dp)
+                .height(200.dp)
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Loaded Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+}
+
 
 
 fun saveUserLoggedInState(context: Context, isLoggedIn: Boolean) {
@@ -307,6 +369,21 @@ fun isUserLoggedIn(context: Context): Boolean {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     return sharedPreferences.getBoolean("isLoggedIn", false)
 }
+
+fun saveVendorId(context: Context, userId: String)
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("userId", userId)
+    editor.apply()
+}
+
+fun getVendorId(context: Context): String?
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("userId", null)
+}
+
 
 fun saveUserType(context: Context, userType: String) {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)

@@ -167,6 +167,7 @@ fun UserSignUpForm()
                             if (documents.isEmpty)
                             {
                                 val userId = UUID.randomUUID().toString()
+
                                 db.collection("users").document(userId).set(user)
                                 successMessage = "Success! Logging in..."
                                 saveUserLoggedInState(context, true)

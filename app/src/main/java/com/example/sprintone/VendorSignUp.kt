@@ -162,6 +162,7 @@ fun VendorSignUpForm()
                             if (documents.isEmpty)
                             {
                                 val vendorId = UUID.randomUUID().toString()
+                                saveVendorId(context, vendorId)
                                 db.collection("vendors").document(vendorId).set(vendor)
                                 successMessage = "Success! Logging in..."
                                 saveUserLoggedInState(context, true)

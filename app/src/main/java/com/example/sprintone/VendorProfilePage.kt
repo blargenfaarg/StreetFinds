@@ -1,6 +1,5 @@
 package com.example.sprintone
 
-import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,15 +17,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -51,8 +50,6 @@ import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -139,6 +136,7 @@ val sundayHours : String,
 val phoneNumber : String
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoadVendorProfilePage(name:String, description:String, type:String, location:String, randomNumber:Int) {
 
@@ -151,7 +149,24 @@ val userId = remember{ mutableStateOf<String?>(null)}
 val email = getUserEmail(context).toString()
 val isFavorite = remember { mutableStateOf(false)}
 val db = Firebase.firestore
-    val userType = getUserType(context)
+val userType = getUserType(context)
+var imageUrls by remember { mutableStateOf<List<String>?>(null) }
+
+
+
+    LaunchedEffect(Unit) {
+        db.collection("vendors").whereEqualTo("Business Name", name)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val vendorDoc = documents.documents.first()
+                    imageUrls = vendorDoc.get("imageUrl") as? List<String>
+                    Log.e("imageUrls", "ImageUrls: $imageUrls")
+                }
+            }
+    }
+
+
 
 LaunchedEffect(key1 = Unit)
 {
@@ -216,30 +231,15 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
 {
     Column()
     {
-        Card(modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp))
+        Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(Color.LightGray))
         {
-            OutlinedCard(modifier = Modifier
-                .width(500.dp)
-                .height(200.dp),
-                colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f,.96f,.74f)))
+            Card(modifier = Modifier.fillMaxWidth().height(125.dp))
                 {
-                   if (userType == "buyer")
-                   {
-                       val buttonColor = if (isFavorite.value) Color.hsl(50f, 0.81f, 0.60f) else Color.Gray
-                       IconButton(onClick = {
-                           handleFavoriteClick()
-                       }, modifier=Modifier.align(Alignment.End))
-                       {
-                           Icon(Icons.Outlined.Star, contentDescription = "Favorite Button", tint = buttonColor)
-                       }
-                   }
-
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp),verticalArrangement = Arrangement.Bottom) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                Column(modifier = Modifier.fillMaxSize().padding(10.dp),
+                    verticalArrangement = Arrangement.Bottom)
+                {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom)
+                    {
                         OutlinedCard(
                             modifier = Modifier
                                 .width(100.dp)
@@ -264,18 +264,44 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                                 modifier = Modifier.padding(start = 10.dp))
                                 Text(text = type, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp))
                         }
+                        Column(modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.End)
+                        {
+                            if (userType == "buyer")
+                            {
+                                val buttonColor = if (isFavorite.value) Color.hsl(50f, 0.81f, 0.60f) else Color.Gray
+                                OutlinedCard {
+                                    IconButton(onClick = {
+                                        handleFavoriteClick()
+                                    })
+                                    {
+                                        Icon(Icons.Outlined.Star, contentDescription = "Favorite Button", tint = buttonColor)
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }
-            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
-                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth())
-                { Text("Description", fontWeight = FontWeight.Bold, fontSize = 20.sp)}
-
-                Text(description, modifier = Modifier.padding(12.dp))
+            Divider(modifier=Modifier.padding(8.dp))
+            Card(modifier = Modifier.fillMaxWidth())
+            {
+                Row(modifier=Modifier.fillMaxWidth())
+                {
+                    Icon(imageVector = Icons.Filled.Info, contentDescription = "Info", modifier= Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 8.dp))
+                    Text(description, modifier = Modifier.padding(12.dp))
+                }
 
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            OutlinedCard(modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.padding(2.dp))
+            Card(modifier = Modifier.fillMaxWidth(), onClick = {
+                val intent = Intent(context, MapsComposeActivity::class.java)
+                intent.putExtra("query", name)
+                context.startActivity(intent)
+            })
             {
                 Row {
                     Icon(
@@ -288,8 +314,15 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                     Text(location, modifier = Modifier.padding(12.dp))
                 }
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            OutlinedCard(modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.padding(2.dp))
+            Card(modifier = Modifier.fillMaxWidth(), onClick = {
+                val intent = Intent(Intent.ACTION_DIAL).apply{
+                    truckListState.value.forEach() {truck ->
+                        data = Uri.parse("tel:${truck.phoneNumber}")}
+                }
+                context.startActivity(intent)
+
+            })
             {
                 Row {
                     Icon(
@@ -304,51 +337,79 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                             text = "Phone Number: ${truck.phoneNumber}",
                             modifier = Modifier.padding(12.dp)
                         )
-                        Button(onClick = {
-                            val intent = Intent(Intent.ACTION_DIAL).apply{
-                                data = Uri.parse("tel:${truck.phoneNumber}")}
-                            context.startActivity(intent)
-                        }){Text("Dial")}
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp),
-                horizontalArrangement = Arrangement.Center)
-            {
-                truckListState.value.forEach() { truck ->
-                    when(day)
-                    {
-                        "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier)
-                        "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier)
-                        "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier)
-                        "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier)
-                        "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier)
-                        "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier)
-                        "Sunday" -> GenerateDayText("Sunday", truck.sundayHours, modifier = Modifier)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.padding(8.dp))
+            Spacer(modifier = Modifier.padding(2.dp))
 
-            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom)
+            Card(modifier = Modifier.fillMaxWidth())
             {
-                Button(onClick = {
-                    val intent = Intent(context, MapsComposeActivity::class.java)
-                    intent.putExtra("query", name)
-                    context.startActivity(intent)}, modifier=Modifier.align(Alignment.Bottom))
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                    horizontalArrangement = Arrangement.Center)
                 {
-                    Text("Show on Map")
+
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "A clock",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    truckListState.value.forEach() { truck ->
+                        when(day)
+                        {
+                            "Monday" -> GenerateDayText("Monday", truck.mondayHours)
+                            "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours)
+                            "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours)
+                            "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours)
+                            "Friday" -> GenerateDayText("Friday", truck.fridayHours)
+                            "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours)
+                            "Sunday" -> GenerateDayText("Sunday", truck.sundayHours)
+                        }
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.padding(2.dp))
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    , horizontalArrangement = Arrangement.Center)
+                {
+                    Text(text = "Images", fontWeight = FontWeight.Medium, color = Color.Black)
+                }
+
+                if (imageUrls.isNullOrEmpty())
+                {
+                    Row(modifier= Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp), horizontalArrangement = Arrangement.Center)
+                    {
+                        Text("No images yet")
+                    }
+                }
+                else
+                {
+                    Box(modifier = Modifier.fillMaxSize())
+                    {
+                        Log.e("EEEEEE", "imageUrls: $imageUrls")
+                        LoadImageFromUrls(imageUrls = imageUrls!!)
+                    }
+                }
+           }
         }
     }
+  }
 }
-}
+
+
 
 
 

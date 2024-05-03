@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -247,15 +248,17 @@ fun DisplayList() {
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-
-                                when(day){
-                                    "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier)
-                                    "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Sunday" -> GenerateDayText("Sunday", truck.sundayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                Box()
+                                {
+                                    when(day){
+                                        "Monday" -> GenerateDayText("Monday", truck.mondayHours)
+                                        "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours)
+                                        "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours)
+                                        "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours)
+                                        "Friday" -> GenerateDayText("Friday", truck.fridayHours)
+                                        "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours)
+                                        "Sunday" -> GenerateDayText("Sunday", truck.sundayHours)
+                                    }
                                 }
                             }
                         }
@@ -268,25 +271,19 @@ fun DisplayList() {
 }
 
 @Composable
-fun GenerateDayText(day: String, hours: String, modifier: Modifier)
+fun GenerateDayText(day: String, hours: String)
 {
     Card(modifier = Modifier.fillMaxWidth())
     {
-        Row(modifier = Modifier.padding(start=4.dp))
-        {
-            Column() {
-                Text(
-                    modifier = modifier,
-                    text = "$day Hours:",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = hours,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    )
+        Column(modifier=Modifier.fillMaxWidth().padding(8.dp)) {
+            Text(
+                text = "$day Hours:",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(text = hours,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black)
             }
-        }
     }
 }
 

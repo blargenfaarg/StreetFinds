@@ -241,7 +241,7 @@ fun VendorGreeting()
                     Text("Update Vendor Info")
                 }
 
-                //PickImageFromGallery()
+                PickImageFromGallery()
 
                 if (showDialog)
                 {
