@@ -228,31 +228,46 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
             .fillMaxSize()
             .padding(10.dp))
         {
-            OutlinedCard(modifier = Modifier
-                .width(500.dp)
-                .height(200.dp),
-                colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f,.96f,.74f)))
-                {
-                   if (userType == "buyer")
-                   {
-                       val buttonColor = if (isFavorite.value) Color.hsl(50f, 0.81f, 0.60f) else Color.Gray
-                       IconButton(onClick = {
-                           handleFavoriteClick()
-                       }, modifier=Modifier.align(Alignment.End))
-                       {
-                           Icon(Icons.Outlined.Star, contentDescription = "Favorite Button", tint = buttonColor)
-                       }
-                   }
+            OutlinedCard(
+                modifier = Modifier
+                    .width(500.dp)
+                    .height(200.dp),
+                colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f, .96f, .74f))
+            )
+            {
+                if (userType == "buyer") {
+                    val buttonColor =
+                        if (isFavorite.value) Color.hsl(50f, 0.81f, 0.60f) else Color.Gray
+                    IconButton(onClick = {
+                        handleFavoriteClick()
+                    }, modifier = Modifier.align(Alignment.End))
+                    {
+                        Icon(
+                            Icons.Outlined.Star,
+                            contentDescription = "Favorite Button",
+                            tint = buttonColor
+                        )
+                    }
+                }
 
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp),verticalArrangement = Arrangement.Bottom) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp), verticalArrangement = Arrangement.Bottom
+                ) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
                         OutlinedCard(
                             modifier = Modifier
                                 .width(100.dp)
                                 .height(100.dp),
-                            colors = CardDefaults.outlinedCardColors(Color.hsl(randomNumber.toFloat(), 0.5f, 0.92f)))
+                            colors = CardDefaults.outlinedCardColors(
+                                Color.hsl(
+                                    randomNumber.toFloat(),
+                                    0.5f,
+                                    0.92f
+                                )
+                            )
+                        )
                         {
                             Icon(
                                 painter = painterResource(R.drawable.icon_foodtruck),
@@ -265,19 +280,25 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                             )
                         }
                         Column {
-                            Text(text = name,
+                            Text(
+                                text = name,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color.Black,
-                                modifier = Modifier.padding(start = 10.dp))
-                                Text(text = type, fontSize = 20.sp, modifier = Modifier.padding(start = 10.dp))
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                            Text(
+                                text = type,
+                                fontSize = 20.sp,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
                         }
                     }
                 }
             }
             OutlinedCard(modifier = Modifier.fillMaxWidth()) {
                 Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth())
-                { Text("Description", fontWeight = FontWeight.Bold, fontSize = 20.sp)}
+                { Text("Description", fontWeight = FontWeight.Bold, fontSize = 20.sp) }
 
                 Text(description, modifier = Modifier.padding(12.dp))
 
@@ -316,48 +337,98 @@ Surface(color = Color.White, modifier = Modifier.fillMaxSize())
                 }
             }
             Spacer(modifier = Modifier.padding(8.dp))
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp),
-                horizontalArrangement = Arrangement.Center)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.Center
+            )
             {
                 truckListState.value.forEach() { truck ->
-                    when(day)
-                    {
-                        "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier)
-                        "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier)
-                        "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier)
-                        "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier)
-                        "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier)
-                        "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier)
-                        "Sunday" -> GenerateDayText("Sunday", truck.sundayHours, modifier = Modifier)
+                    when (day) {
+                        "Monday" -> GenerateDayText(
+                            "Monday",
+                            truck.mondayHours,
+                            modifier = Modifier
+                        )
+
+                        "Tuesday" -> GenerateDayText(
+                            "Tuesday",
+                            truck.tuesdayHours,
+                            modifier = Modifier
+                        )
+
+                        "Wednesday" -> GenerateDayText(
+                            "Wednesday",
+                            truck.wednesdayHours,
+                            modifier = Modifier
+                        )
+
+                        "Thursday" -> GenerateDayText(
+                            "Thursday",
+                            truck.thursdayHours,
+                            modifier = Modifier
+                        )
+
+                        "Friday" -> GenerateDayText(
+                            "Friday",
+                            truck.fridayHours,
+                            modifier = Modifier
+                        )
+
+                        "Saturday" -> GenerateDayText(
+                            "Saturday",
+                            truck.saturdayHours,
+                            modifier = Modifier
+                        )
+
+                        "Sunday" -> GenerateDayText(
+                            "Sunday",
+                            truck.sundayHours,
+                            modifier = Modifier
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.padding(8.dp))
 
-            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom)
+            Row(
+                horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Bottom
+            )
             {
                 Button(onClick = {
                     val intent = Intent(context, MapsComposeActivity::class.java)
                     intent.putExtra("query", name)
-                    context.startActivity(intent)}, modifier=Modifier.align(Alignment.Bottom))
+                    context.startActivity(intent)
+                }, modifier = Modifier.align(Alignment.Bottom))
                 {
                     Text("Show on Map")
                 }
             }
-            var myRating by remember { mutableIntStateOf(0) }
-            RatingBar(
-                currentRating = myRating,
-                onRatingChanged = { myRating = it }
-            )
+            OutlinedCard(
+                modifier = Modifier
+                    .width(500.dp)
+                    .height(200.dp),
+                colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f, .96f, .74f))
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                {
+                    var myRating by remember { mutableIntStateOf(0) }
+                    RatingBar(
+                        currentRating = myRating,
+                        onRatingChanged = { myRating = it }
+                    )
+
+                }
+
+
+            }
         }
-
-
-
-
     }
 }
 }
