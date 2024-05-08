@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.RatingBar
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -61,6 +62,9 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.mutableIntStateOf
 
 class VendorProfilePage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,12 +134,17 @@ class VendorProfilePage : ComponentActivity() {
                                 }
                             }
                         }
+
+
                     }
+
                 }
+
             }
         }
     }
 }
+
 
 
 data class TruckHours(
@@ -288,6 +297,7 @@ fun LoadVendorProfilePage(
                                     )
                                 )
                             )
+
                             {
                                 Icon(
                                     painter = painterResource(R.drawable.icon_foodtruck),
@@ -406,6 +416,8 @@ fun LoadVendorProfilePage(
                                 modifier = Modifier.padding(12.dp)
                             )
                         }
+
+
                     }
                 }
 
@@ -505,9 +517,31 @@ fun LoadVendorProfilePage(
                 }
 
             }
+            OutlinedCard(
+                modifier = Modifier
+                    .width(500.dp)
+                    .height(200.dp),
+                colors = CardDefaults.outlinedCardColors(Color.hsl(222.0f, .96f, .74f))
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                {
+                    var myRating by remember { mutableIntStateOf(0) }
+                    RatingBar(
+                        currentRating = myRating,
+                        onRatingChanged = { myRating = it }
+                    )
+
+                }
+
+
+            }
         }
     }
 }
+
 
 @Composable
 fun RatingBar(
