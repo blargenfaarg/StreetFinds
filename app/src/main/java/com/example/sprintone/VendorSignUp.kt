@@ -8,19 +8,26 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,12 +41,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -81,75 +91,107 @@ fun VendorSignUpForm()
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Text(
-                text = "Create a vendor account",
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                modifier = Modifier.padding(20.dp),
-                lineHeight = 25.sp
-            )
-            OutlinedTextField(
-                value = email,
-                onValueChange = {
-                    email  = it
-                    isEmailValid = emailRegex.matches(it)
-                },
-                label = { Text(text = "Enter an email address", color = Color.Black) },
-                isError = !isEmailValid,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Email,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                }
-            )
-            if (!isEmailValid) {
+            Card(modifier = Modifier.padding(16.dp),
+                colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)))
+            {
                 Text(
-                    text = "Please enter a valid email address (e.g., xyz123@domain.com)",
-                    color = Color.Red,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                    text = "New Vendors",
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 38.sp,
+                    modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp),
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {
+                        email  = it
+                        isEmailValid = emailRegex.matches(it)
+                    },
+                    label = { Text(text = "Enter an email address", color = Color.Black) },
+                    isError = !isEmailValid,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Email,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
+                )
+                if (!isEmailValid) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
+                    {
+                        Text(
+                            text = "Please enter a valid email address (e.g., xyz123@domain.com)",
+                            color = Color.Red,
+                            fontWeight = FontWeight.ExtraBold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                        )
+                    }
+                }
+                Divider()
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password  = it },
+                    label = { Text(text = "Enter a password", color = Color.Black) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
+                )
+                OutlinedTextField(
+                    value = verifyPass,
+                    onValueChange = {
+                        verifyPass = it
+                        doPasswordsMatch = verifyPass == password
+                    },
+                    label = {Text(text = "Re-enter password", color = Color.Black)},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
+                    }
+                )
+                if (!doPasswordsMatch){
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
+                    {
+                        Text(
+                            text = "Passwords do not match",
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Red,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                        )
+                    }
+                }
+            }
+            Divider(color = Color.DarkGray)
+
+            successMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Green,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password  = it },
-                label = { Text(text = "Enter a password", color = Color.Black) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Lock,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                }
-            )
-            OutlinedTextField(
-                value = verifyPass,
-                onValueChange = {
-                    verifyPass = it
-                    doPasswordsMatch = verifyPass == password
-                },
-                label = {Text(text = "Re-enter password", color = Color.Black)},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Lock,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                }
-            )
-            if (!doPasswordsMatch){
-                Text(text = "Passwords do not match", color = Color.Red, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
-            }
+
             Button(
                 onClick = {
                     val vendor = hashMapOf(
@@ -179,7 +221,7 @@ fun VendorSignUpForm()
                             else{
                                 errorMessage = "An account with this email already exists."
                                 coroutineScope.launch {
-                                    delay(5000)
+                                    delay(3200)
                                     errorMessage = null
                                 }
                             }
@@ -192,44 +234,55 @@ fun VendorSignUpForm()
                 enabled = email.isNotBlank()
                         && password.isNotBlank() &&verifyPass.isNotBlank() && doPasswordsMatch,
                 modifier = Modifier
-                    .height(80.dp)
-                    .width(250.dp)
-                    .padding(16.dp)
-                    .background(Color.White)
-            ) {
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(Color.hsl(225f, 0.6f, 0.9f)))
+            {
                 Text(
-                    text = "Create Account",
+                    text = "Sign Up",
                     fontSize = 20.sp,
                     color = Color.Black
                 )
             }
-            OutlinedButton(
+            Text("or")
+
+            Button(
                 onClick = {
                     context.startActivity(Intent(context, VendorLogIn::class.java))
                 },
-                colors = ButtonDefaults.buttonColors(Color.LightGray)
+                colors = ButtonDefaults.buttonColors(Color.LightGray),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(12.dp)
             )
             {
                 Text(
-                    text = "Sign in to existing account",
+                    text = "Sign into Existing Account",
                     fontSize = 15.sp,
                     color = Color.Black
                 )
             }
 
             errorMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            successMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Green,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Dialog(onDismissRequest = {  }) {
+                    Card(modifier = Modifier.height(80.dp).fillMaxWidth())
+                    {
+                        Column(verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text(
+                                text = it,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Color.Red,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }

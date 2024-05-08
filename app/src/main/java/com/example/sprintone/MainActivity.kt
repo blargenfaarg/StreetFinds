@@ -16,6 +16,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -57,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
@@ -69,6 +72,8 @@ import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class MainActivity : ComponentActivity()
 {
@@ -120,6 +125,8 @@ fun LoadGreeting()
         LogInScreen()
     }
 }
+
+
 @Composable
 fun LogInScreen()
 {
@@ -225,60 +232,54 @@ fun PickImageFromGallery()
     val scope = rememberCoroutineScope()
     var uploadProgress by remember { mutableStateOf(0f) }
     var uploadStatus by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false)}
 
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ uri: Uri? ->
         imageUri = uri
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        imageUri?.let {
-            if (Build.VERSION.SDK_INT < 28)
-            {
-                bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-            }
-            else
-            {
-                val source = ImageDecoder.createSource(context.contentResolver, it)
-                bitmap.value = ImageDecoder.decodeBitmap(source)
-            }
-            bitmap.value?.let { btm ->
-                Image(
-                    bitmap = btm.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(400.dp)
-                        .padding(20.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = { launcher.launch("image/*") })
+        Button(onClick = { launcher.launch("image/*")
+        showDialog = true})
         {
             Text(text="Select Image")
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        if (imageUri != null) {
-            Button(onClick = { uploadImageToFirebaseStorage(imageUri!!, storageRef, scope, { progress ->
+        if (imageUri != null && showDialog)
+        {
+            AlertDialog(onDismissRequest = { showDialog = false }, confirmButton = { Button(onClick = { uploadImageToFirebaseStorage(imageUri!!, storageRef, scope, { progress ->
                 uploadProgress = progress
             }, { status ->
                 uploadStatus = status
-            }, context) }) {
-                Text("Upload Image")
-            }
+            }, context)
+                Timer().schedule(2000)
+                {
+                    showDialog = false
+                }
+            }) { Text("Upload Image") } }, text = {
+                Column()
+                {
+                    imageUri?.let {
+                        if (Build.VERSION.SDK_INT < 28) {
+                            bitmap.value =
+                                MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                        } else {
+                            val source = ImageDecoder.createSource(context.contentResolver, it)
+                            bitmap.value = ImageDecoder.decodeBitmap(source)
+                        }
+                        bitmap.value?.let { btm ->
+                            Image(
+                                bitmap = btm.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(400.dp)
+                                    .padding(20.dp)
+                            )
+                        }
+                    }
+                }
+            }, title = {Text("Everything look good?", fontWeight = FontWeight.ExtraBold)},
+                dismissButton = {Button(onClick = {showDialog=false}){Text("Cancel")} })
         }
-        if (uploadProgress > 0) {
-            LinearProgressIndicator(progress = uploadProgress, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Upload Progress: ${uploadProgress * 100}%")
-        }
-        Text(uploadStatus)
-
-    }
 }
 
 fun saveImageUrlToFirestore(vendorId: String, imageUrl: String)
@@ -350,7 +351,7 @@ fun LoadImageFromUrls(imageUrls: List<String>) {
                     painter = painter,
                     contentDescription = "Loaded Image",
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
         }

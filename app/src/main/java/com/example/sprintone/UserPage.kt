@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
@@ -37,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,31 +87,47 @@ fun LoadUserProfile() {
                 .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ){
-                Text(
-                    text = "Hello $email",
-                    color = Color.Black,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center
-                )
-                OutlinedCard(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp))
+                Card(colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)),
+                    modifier = Modifier.padding(16.dp))
                 {
-                    Column(modifier=Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally)
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
                     {
-                        Text("Your Favorite Vendors:", modifier=Modifier.padding(10.dp), fontWeight = FontWeight.ExtraBold)
-                        truckNames.forEach { name ->
-                            OutlinedCard(modifier = Modifier.fillMaxWidth().padding(5.dp), onClick = {
-                                val intent = Intent(context, VendorProfilePage::class.java)
-                                intent.putExtra("name", name)
-                                context.startActivity(intent)})
-                            {
-                                Text(name, modifier = Modifier.padding(20.dp), fontWeight = FontWeight.Medium)
+                        Text(
+                            text = "Hello $email",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+
+                    OutlinedCard(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp))
+                    {
+                        Column(modifier=Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally)
+                        {
+                            Text("Your Favorite Vendors:", modifier=Modifier.padding(10.dp), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                            truckNames.forEach { name ->
+                                Card(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp), onClick = {
+                                    val intent = Intent(context, VendorProfilePage::class.java)
+                                    intent.putExtra("name", name)
+                                    context.startActivity(intent)}, colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)))
+                                {
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
+                                    {
+                                        Text(name, modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Medium, fontSize = 24.sp)
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(96.dp))
                 Button(onClick = {

@@ -10,9 +10,11 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -40,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -59,51 +64,49 @@ class VendorPage : ComponentActivity() {
             SprintOneTheme {
                 Scaffold(
                     bottomBar = {
-                        LoadNavBar()},
-                    ) {
-                    innerPadding ->
-                        Column(modifier = Modifier.padding(innerPadding))
-                        {
-                            VendorGreeting()
-                        }
+                        LoadNavBar()
+                    },
+                ) { innerPadding ->
+                    Column(modifier = Modifier.padding(innerPadding))
+                    {
+                        VendorGreeting()
+                    }
                 }
             }
         }
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @Preview
-fun VendorGreeting()
-{
+fun VendorGreeting() {
     val context = LocalContext.current
     val db = Firebase.firestore
     val email = getUserEmail(context)
     val scrollState = rememberScrollState()
 
-    var businessName by remember { mutableStateOf("")}
-    var businessDescription by remember { mutableStateOf("")}
-    var businessType by remember { mutableStateOf("")}
-    var businessLocation by remember { mutableStateOf("")}
-    var hasEnteredBusiness by remember { mutableStateOf(false)}
-    var showDialog by remember { mutableStateOf(false)}
-    var showHoursDialog by remember { mutableStateOf(false)}
+    var businessName by remember { mutableStateOf("") }
+    var businessDescription by remember { mutableStateOf("") }
+    var businessType by remember { mutableStateOf("") }
+    var businessLocation by remember { mutableStateOf("") }
+    var hasEnteredBusiness by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var showHoursDialog by remember { mutableStateOf(false) }
 
-    var newBusinessName by remember { mutableStateOf("")}
-    var newBusinessDescription by remember { mutableStateOf("")}
-    var newBusinessLocation by remember { mutableStateOf("")}
-    var newBusinessType by remember { mutableStateOf("")}
+    var newBusinessName by remember { mutableStateOf("") }
+    var newBusinessDescription by remember { mutableStateOf("") }
+    var newBusinessLocation by remember { mutableStateOf("") }
+    var newBusinessType by remember { mutableStateOf("") }
 
-    var nameWasChanged by remember { mutableStateOf(false)}
-    var descriptionWasChanged by remember { mutableStateOf(false)}
-    var locationWasChanged by remember { mutableStateOf(false)}
-    var typeWasChanged by remember { mutableStateOf(false)}
-    var wereHoursUpdated by remember{ mutableStateOf(false)}
-    var expanded by remember { mutableStateOf(false)}
-    var selectedText by remember { mutableStateOf("New Type")}
+    var nameWasChanged by remember { mutableStateOf(false) }
+    var descriptionWasChanged by remember { mutableStateOf(false) }
+    var locationWasChanged by remember { mutableStateOf(false) }
+    var typeWasChanged by remember { mutableStateOf(false) }
+    var wereHoursUpdated by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf("New Type") }
 
     var truckMondayHours = remember { mutableStateOf("Closed") }
     var truckTuesdayHours = remember { mutableStateOf("Closed") }
@@ -113,15 +116,19 @@ fun VendorGreeting()
     var truckSaturdayHours = remember { mutableStateOf("Closed") }
     var truckSundayHours = remember { mutableStateOf("Closed") }
 
-    val truckHours = remember { mutableStateOf(mapOf(
-        "Monday" to mutableStateOf(Pair("", "")),
-        "Tuesday" to mutableStateOf(Pair("", "")),
-        "Wednesday" to mutableStateOf(Pair("", "")),
-        "Thursday" to mutableStateOf(Pair("", "")),
-        "Friday" to mutableStateOf(Pair("", "")),
-        "Saturday" to mutableStateOf(Pair("", "")),
-        "Sunday" to mutableStateOf(Pair("", ""))
-    ))}
+    val truckHours = remember {
+        mutableStateOf(
+            mapOf(
+                "Monday" to mutableStateOf(Pair("", "")),
+                "Tuesday" to mutableStateOf(Pair("", "")),
+                "Wednesday" to mutableStateOf(Pair("", "")),
+                "Thursday" to mutableStateOf(Pair("", "")),
+                "Friday" to mutableStateOf(Pair("", "")),
+                "Saturday" to mutableStateOf(Pair("", "")),
+                "Sunday" to mutableStateOf(Pair("", ""))
+            )
+        )
+    }
 
 
     Surface(modifier = Modifier.fillMaxSize())
@@ -132,7 +139,7 @@ fun VendorGreeting()
             modifier = Modifier
                 .padding(8.dp)
                 .verticalScroll(scrollState)
-        ){
+        ) {
             Text(
                 text = "Welcome $email",
                 color = Color.Black,
@@ -144,82 +151,116 @@ fun VendorGreeting()
             db.collection("vendors").whereEqualTo("Email", email)
                 .get()
                 .addOnSuccessListener { documents ->
-                for (document in documents){
-                    businessName = document.getString("Business Name").toString()
-                }
+                    for (document in documents) {
+                        businessName = document.getString("Business Name").toString()
+                    }
                     db.collection("trucks").whereEqualTo("Name", businessName)
                         .get()
                         .addOnSuccessListener { querySnapshot ->
-                            if (querySnapshot.isEmpty)
-                            {
+                            if (querySnapshot.isEmpty) {
                                 hasEnteredBusiness = false
-                            } else
-                            {
+                            } else {
                                 for (document in querySnapshot) {
                                     hasEnteredBusiness = true
-                                    businessDescription = document.getString("Description").toString()
+                                    businessDescription =
+                                        document.getString("Description").toString()
                                     businessLocation = document.getString("Location").toString()
                                     businessType = document.getString("Type").toString()
-                                    truckMondayHours.value = document.getString("Monday Hours").toString()
-                                    truckTuesdayHours.value = document.getString("Tuesday Hours").toString()
-                                    truckWednesdayHours.value = document.getString("Wednesday Hours").toString()
-                                    truckThursdayHours.value = document.getString("Thursday Hours").toString()
-                                    truckFridayHours.value = document.getString("Friday Hours").toString()
-                                    truckSaturdayHours.value = document.getString("Saturday Hours").toString()
-                                    truckSundayHours.value = document.getString("Sunday Hours").toString()
+                                    truckMondayHours.value =
+                                        document.getString("Monday Hours").toString()
+                                    truckTuesdayHours.value =
+                                        document.getString("Tuesday Hours").toString()
+                                    truckWednesdayHours.value =
+                                        document.getString("Wednesday Hours").toString()
+                                    truckThursdayHours.value =
+                                        document.getString("Thursday Hours").toString()
+                                    truckFridayHours.value =
+                                        document.getString("Friday Hours").toString()
+                                    truckSaturdayHours.value =
+                                        document.getString("Saturday Hours").toString()
+                                    truckSundayHours.value =
+                                        document.getString("Sunday Hours").toString()
                                 }
                             }
                         }
-                        .addOnFailureListener{
+                        .addOnFailureListener {
                             Log.e("Error", "Another error happened.")
                         }
                 }
-                .addOnFailureListener{
-                    Log.e("Error","Couldn't find a matching document")
+                .addOnFailureListener {
+                    Log.e("Error", "Couldn't find a matching document")
                 }
-            if (hasEnteredBusiness)
-            {
+            if (hasEnteredBusiness) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(horizontalAlignment = Alignment.Start) {
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, color = Color.Black))
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black
+                                    )
+                                )
                                 {
-                                    append("Your Business Name: \n")
+                                    append("Your Business Name: ")
                                 }
                                 append(businessName)
                             }, modifier = Modifier.padding(8.dp)
                         )
+                        Divider()
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, color = Color.Black))
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black
+                                    )
+                                )
                                 {
-                                    append("Your Business Type: \n")
+                                    append("Your Business Type: ")
                                 }
                                 append(businessType)
                             }, modifier = Modifier.padding(8.dp)
                         )
+                        Divider()
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, color = Color.Black))
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black
+                                    )
+                                )
                                 {
-                                    append("Your Business Description: \n")
+                                    append("Your Business Description: ")
                                 }
                                 append(businessDescription)
                             }, modifier = Modifier.padding(8.dp)
                         )
+                        Divider()
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, color = Color.Black))
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black
+                                    )
+                                )
                                 {
-                                    append("Your Business Location: \n")
+                                    append("Your Business Location: ")
                                 }
                                 append(businessLocation)
                             }, modifier = Modifier.padding(8.dp)
                         )
+                        Divider()
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, color = Color.Black))
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black
+                                    )
+                                )
                                 {
                                     append("Your Business Hours: \n")
                                 }
@@ -229,115 +270,149 @@ fun VendorGreeting()
                                 append("Thursday Hours: ${truckThursdayHours.value}\n")
                                 append("Friday Hours: ${truckFridayHours.value}\n")
                                 append("Saturday Hours: ${truckSaturdayHours.value}\n")
-                                append("Sunday Hours: ${truckSundayHours.value}\n")
+                                append("Sunday Hours: ${truckSundayHours.value}")
 
                             }, modifier = Modifier.padding(8.dp)
                         )
+                        Divider()
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        {
+                            Button(onClick = { showDialog = true })
+                            {
+                                Text("Update Vendor Info")
+                            }
+                            PickImageFromGallery()
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
 
-                Button(onClick = { showDialog = true })
-                {
-                    Text("Update Vendor Info")
-                }
-
-                PickImageFromGallery()
-
-                if (showDialog)
-                {
+                if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
                         confirmButton = {
-                            Button(onClick = {
-                                showDialog = false
-                                if (nameWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty) {
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("trucks").document(vendorId).update("Name", newBusinessName)
-                                                businessName = newBusinessName
+                            Button(
+                                onClick = {
+                                    showDialog = false
+                                    if (nameWasChanged) {
+                                        db.collection("trucks").whereEqualTo("Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update("Name", newBusinessName)
+                                                    businessName = newBusinessName
+                                                }
                                             }
-                                        }
 
-                                    db.collection("vendors").whereEqualTo("Business Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty) {
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("vendors").document(vendorId)
-                                                    .update("Business Name", newBusinessName)
+                                        db.collection("vendors")
+                                            .whereEqualTo("Business Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("vendors").document(vendorId)
+                                                        .update("Business Name", newBusinessName)
+                                                }
                                             }
-                                        }
-                                }
-                                if (descriptionWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty) {
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("trucks").document(vendorId).update("Description", newBusinessDescription)
+                                    }
+                                    if (descriptionWasChanged) {
+                                        db.collection("trucks").whereEqualTo("Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Description",
+                                                            newBusinessDescription
+                                                        )
 
-                                                businessDescription = newBusinessDescription
+                                                    businessDescription = newBusinessDescription
+                                                }
                                             }
-                                        }
-                                }
-                                if(locationWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty) {
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("trucks").document(vendorId).update("Location", newBusinessLocation)
+                                    }
+                                    if (locationWasChanged) {
+                                        db.collection("trucks").whereEqualTo("Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update("Location", newBusinessLocation)
 
-                                                businessLocation = newBusinessLocation
+                                                    businessLocation = newBusinessLocation
+                                                }
                                             }
-                                        }
-                                }
-                                if(typeWasChanged) {
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty) {
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("trucks").document(vendorId).update("Type", newBusinessType)
+                                    }
+                                    if (typeWasChanged) {
+                                        db.collection("trucks").whereEqualTo("Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update("Type", newBusinessType)
 
-                                                businessType = newBusinessType
+                                                    businessType = newBusinessType
+                                                }
                                             }
-                                        }
-                                }
-                                if (wereHoursUpdated)
-                                {
-                                    db.collection("trucks").whereEqualTo("Name", businessName)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            if (!documents.isEmpty){
-                                                val vendorDoc = documents.documents.first()
-                                                val vendorId = vendorDoc.id
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Monday Hours", truckMondayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Tuesday Hours", truckTuesdayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Wednesday Hours", truckWednesdayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Thursday Hours", truckThursdayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Friday Hours", truckFridayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Saturday Hours", truckSaturdayHours.value)
-                                                db.collection("trucks").document(vendorId)
-                                                    .update("Sunday Hours", truckSundayHours.value)
+                                    }
+                                    if (wereHoursUpdated) {
+                                        db.collection("trucks").whereEqualTo("Name", businessName)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                if (!documents.isEmpty) {
+                                                    val vendorDoc = documents.documents.first()
+                                                    val vendorId = vendorDoc.id
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Monday Hours",
+                                                            truckMondayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Tuesday Hours",
+                                                            truckTuesdayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Wednesday Hours",
+                                                            truckWednesdayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Thursday Hours",
+                                                            truckThursdayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Friday Hours",
+                                                            truckFridayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Saturday Hours",
+                                                            truckSaturdayHours.value
+                                                        )
+                                                    db.collection("trucks").document(vendorId)
+                                                        .update(
+                                                            "Sunday Hours",
+                                                            truckSundayHours.value
+                                                        )
+                                                }
                                             }
-                                        }
-                                }
-                                             },
+                                    }
+                                },
                                 enabled = (newBusinessName.isNotBlank()
                                         || newBusinessType.isNotBlank()
                                         || newBusinessDescription.isNotBlank()
@@ -346,46 +421,62 @@ fun VendorGreeting()
                             {
                                 Text("Update")
                             }
-                                        },
+                        },
                         dismissButton = {
                             Button(onClick = {
                                 showDialog = false
-                            }){
+                            }) {
                                 Text("Cancel")
                             }
                         },
-                        title = {Text("Update information")},
+                        title =
+                        {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            )
+                            {
+                                Text("Update information", fontWeight = FontWeight.ExtraBold)
+                            }
+                        },
                         text = {
-                            Column{
+                            Column {
                                 OutlinedTextField(
                                     value = newBusinessName,
                                     onValueChange = {
                                         newBusinessName = it
-                                        if (newBusinessName != businessName)
-                                        {
+                                        if (newBusinessName != businessName) {
                                             nameWasChanged = true
-                                        }
-                                        else{
+                                        } else {
                                             nameWasChanged = false
                                         }
-                                                    },
+                                    },
                                     label = { Text("New Name") },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(4.dp)
                                 )
 
-                                ExposedDropdownMenuBox(expanded = expanded,
-                                    onExpandedChange = {expanded = !expanded},
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = !expanded },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(4.dp))
+                                        .padding(4.dp)
+                                )
                                 {
-                                    OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier=Modifier
-                                        .menuAnchor()
-                                        .fillMaxWidth())
-                                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
-                                        DropdownMenuItem(text = {Text("American")},
+                                    OutlinedTextField(
+                                        value = selectedText,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        modifier = Modifier
+                                            .menuAnchor()
+                                            .fillMaxWidth()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }) {
+                                        DropdownMenuItem(text = { Text("American") },
                                             onClick = {
                                                 newBusinessType = "American"
                                                 selectedText = newBusinessType
@@ -393,7 +484,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Mexican")},
+                                        DropdownMenuItem(text = { Text("Mexican") },
                                             onClick = {
                                                 newBusinessType = "Mexican"
                                                 selectedText = newBusinessType
@@ -401,7 +492,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Fusion")},
+                                        DropdownMenuItem(text = { Text("Fusion") },
                                             onClick = {
                                                 newBusinessType = "Fusion"
                                                 selectedText = newBusinessType
@@ -409,7 +500,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Asian")},
+                                        DropdownMenuItem(text = { Text("Asian") },
                                             onClick = {
                                                 newBusinessType = "Asian"
                                                 selectedText = newBusinessType
@@ -417,7 +508,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Seafood")},
+                                        DropdownMenuItem(text = { Text("Seafood") },
                                             onClick = {
                                                 newBusinessType = "Seafood"
                                                 selectedText = newBusinessType
@@ -425,7 +516,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Breakfast")},
+                                        DropdownMenuItem(text = { Text("Breakfast") },
                                             onClick = {
                                                 newBusinessType = "Breakfast"
                                                 selectedText = newBusinessType
@@ -433,7 +524,7 @@ fun VendorGreeting()
                                                 typeWasChanged = true
 
                                             })
-                                        DropdownMenuItem(text = {Text("Italian")},
+                                        DropdownMenuItem(text = { Text("Italian") },
                                             onClick = {
                                                 newBusinessType = "Italian"
                                                 selectedText = newBusinessType
@@ -448,14 +539,12 @@ fun VendorGreeting()
                                     value = newBusinessDescription,
                                     onValueChange = {
                                         newBusinessDescription = it
-                                        if (newBusinessDescription == businessDescription)
-                                        {
+                                        if (newBusinessDescription == businessDescription) {
 
-                                        }
-                                        else{
+                                        } else {
                                             descriptionWasChanged = true
                                         }
-                                                    },
+                                    },
                                     label = { Text("New Description") },
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -463,28 +552,29 @@ fun VendorGreeting()
                                 )
                                 OutlinedTextField(
                                     value = newBusinessLocation,
-                                    onValueChange = { newBusinessLocation = it
-                                        if (newBusinessLocation == businessLocation)
-                                        {
+                                    onValueChange = {
+                                        newBusinessLocation = it
+                                        if (newBusinessLocation == businessLocation) {
 
-                                        }
-                                        else {
+                                        } else {
                                             locationWasChanged = true
                                         }
-                                                    },
+                                    },
                                     label = { Text("New Location") },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(4.dp)
                                 )
-                                Button(onClick = {
-                                    showHoursDialog = true
-                                })
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                )
                                 {
-                                    Text("Update Hours")
+                                    Button(onClick = { showHoursDialog = true })
+                                    { Text("Update Hours") }
                                 }
-                                if (showHoursDialog)
-                                {
+
+                                if (showHoursDialog) {
                                     val updateHours = { day: String, hours: String ->
                                         when (day) {
                                             "Monday" -> truckMondayHours.value = hours
@@ -505,15 +595,32 @@ fun VendorGreeting()
                                             })
                                             {
                                                 Text("Save")
-                                            } },
-                                        dismissButton = { Button(onClick = { showHoursDialog = false })
-                                        {
-                                            Text("Cancel")
-                                        } },
-                                        title = {Text("Enter New Hours")},
+                                            }
+                                        },
+                                        dismissButton = {
+                                            Button(onClick = { showHoursDialog = false })
+                                            {
+                                                Text("Cancel")
+                                            }
+                                        },
+                                        title = {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.Center
+                                            )
+                                            {
+                                                Text(
+                                                    "Enter New Hours",
+                                                    fontWeight = FontWeight.ExtraBold
+                                                )
+                                            }
+                                        },
                                         text = {
                                             Column {
-                                                WeeklyBusinessHours(truckHours = truckHours, updateHours)
+                                                WeeklyBusinessHours(
+                                                    truckHours = truckHours,
+                                                    updateHours
+                                                )
                                             }
                                         }
                                     )
@@ -524,27 +631,52 @@ fun VendorGreeting()
                 }
             }
 
-            if (!hasEnteredBusiness)
-            {
-                Spacer(modifier = Modifier.padding(30.dp))
-                Text(text = "To list your business, please fill out the vendor form.", fontSize = 20.sp)
-                Spacer(modifier = Modifier.padding(10.dp))
-                Button(onClick = {context.startActivity(Intent(context, VendorForm::class.java))})
-                {
-                    Text(text = "Vendor Form",
-                        fontSize = 30.sp)
+            if (!hasEnteredBusiness) {
+                Spacer(modifier = Modifier.padding(15.dp))
+                Card(
+                    modifier = Modifier.padding(16.dp),
+                    colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f))
+                ) {
+                    Text(
+                        text = "To list your business, please fill out the vendor form.",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    context,
+                                    VendorForm::class.java
+                                )
+                            )
+                        }, modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
+                    {
+                        Text(text = "Vendor Form")
+                    }
                 }
             }
 
-            Button(onClick = {
-                val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                editor.clear()
-                editor.apply()
-                context.startActivity(Intent(context, MainActivity::class.java)) },
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Button(
+                onClick = {
+                    val sharedPreferences =
+                        context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+                    val editor = sharedPreferences.edit()
+                    editor.clear()
+                    editor.apply()
+                    context.startActivity(Intent(context, MainActivity::class.java))
+                },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .size(200.dp, 50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Gray) )
+                    .size(200.dp, 50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            )
             {
                 Text("Sign out", fontSize = 24.sp)
             }
