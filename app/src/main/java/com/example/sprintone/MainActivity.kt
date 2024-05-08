@@ -3,18 +3,22 @@ package com.example.sprintone
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +28,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -43,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,13 +59,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.example.sprintone.ui.theme.SprintOneTheme
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class MainActivity : ComponentActivity()
 {
@@ -108,6 +125,8 @@ fun LoadGreeting()
         LogInScreen()
     }
 }
+
+
 @Composable
 fun LogInScreen()
 {
@@ -213,70 +232,82 @@ fun PickImageFromGallery()
     val scope = rememberCoroutineScope()
     var uploadProgress by remember { mutableStateOf(0f) }
     var uploadStatus by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false)}
 
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){ uri: Uri? ->
         imageUri = uri
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        imageUri?.let {
-            if (Build.VERSION.SDK_INT < 28)
-            {
-                bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-            }
-            else
-            {
-                val source = ImageDecoder.createSource(context.contentResolver, it)
-                bitmap.value = ImageDecoder.decodeBitmap(source)
-            }
-            bitmap.value?.let { btm ->
-                Image(
-                    bitmap = btm.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(400.dp)
-                        .padding(20.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = { launcher.launch("image/*") })
+        Button(onClick = { launcher.launch("image/*")
+        showDialog = true})
         {
-            Text(text="Pick Image")
+            Text(text="Select Image")
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        if (imageUri != null) {
-            Button(onClick = { uploadImageToFirebaseStorage(imageUri!!, storageRef, scope, { progress ->
+        if (imageUri != null && showDialog)
+        {
+            AlertDialog(onDismissRequest = { showDialog = false }, confirmButton = { Button(onClick = { uploadImageToFirebaseStorage(imageUri!!, storageRef, scope, { progress ->
                 uploadProgress = progress
             }, { status ->
                 uploadStatus = status
-            }) }) {
-                Text("Upload Image")
-            }
+            }, context)
+                Timer().schedule(2000)
+                {
+                    showDialog = false
+                }
+            }) { Text("Upload Image") } }, text = {
+                Column()
+                {
+                    imageUri?.let {
+                        if (Build.VERSION.SDK_INT < 28) {
+                            bitmap.value =
+                                MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                        } else {
+                            val source = ImageDecoder.createSource(context.contentResolver, it)
+                            bitmap.value = ImageDecoder.decodeBitmap(source)
+                        }
+                        bitmap.value?.let { btm ->
+                            Image(
+                                bitmap = btm.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(400.dp)
+                                    .padding(20.dp)
+                            )
+                        }
+                    }
+                }
+            }, title = {Text("Everything look good?", fontWeight = FontWeight.ExtraBold)},
+                dismissButton = {Button(onClick = {showDialog=false}){Text("Cancel")} })
         }
-        if (uploadProgress > 0) {
-            LinearProgressIndicator(progress = uploadProgress, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Upload Progress: ${uploadProgress * 100}%")
-        }
-        Text(uploadStatus)
+}
 
+fun saveImageUrlToFirestore(vendorId: String, imageUrl: String)
+{
+    Log.e("Vendor ID", "Vendor ID: $vendorId")
+    val db = FirebaseFirestore.getInstance()
+    val vendorRef = db.collection("vendors").document(vendorId)
+    db.runTransaction { transaction ->
+        val snapshot = transaction.get(vendorRef)
+        val imageUris = snapshot.get("imageUrl") as? MutableList<String> ?: mutableListOf()
+        imageUris.add(imageUrl)
+        transaction.update(vendorRef, "imageUrl", imageUris)
+        null
+    }.addOnSuccessListener {
+        println("Image URI added to vendor profile successfully!")
+    }.addOnFailureListener { e ->
+        println("Transaction failure: $e")
     }
 }
 
-fun uploadImageToFirebaseStorage(
-    fileUri: Uri,
-    storageRef: StorageReference,
-    scope: CoroutineScope,
-    onProgress: (Float) -> Unit,
-    onStatus: (String) -> Unit
+fun uploadImageToFirebaseStorage(fileUri: Uri, storageRef: StorageReference,
+                                 scope: CoroutineScope,
+                                 onProgress: (Float) -> Unit,
+                                 onStatus: (String) -> Unit, context: Context
 ) {
-    val fileRef = storageRef.child("uploads/${fileUri.lastPathSegment}")
+    val vendorId = getVendorId(context)
+    Log.e("Upload Image To Firebase Storage: ", "vendorID: $vendorId")
+    val fileRef = storageRef.child("uploads/$vendorId/${fileUri.lastPathSegment}")
     val uploadTask = fileRef.putFile(fileUri)
 
     uploadTask.addOnProgressListener { taskSnapshot ->
@@ -288,12 +319,45 @@ fun uploadImageToFirebaseStorage(
         scope.launch {
             onStatus("Upload failed: ${it.message}")
         }
-    }.addOnSuccessListener {
+    }.addOnSuccessListener { taskSnapshot ->
+        fileRef.downloadUrl.addOnSuccessListener { uri ->
+            val imageUrl = uri.toString()
+            saveImageUrlToFirestore(vendorId.toString(), imageUrl)
+        }
         scope.launch {
             onStatus("Upload successful!")
         }
     }
 }
+
+@Composable
+fun LoadImageFromUrls(imageUrls: List<String>) {
+    LazyRow(modifier = Modifier.fillMaxWidth()) {
+        items(imageUrls) { imageUrl ->
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = imageUrl)
+                    .apply {
+                        crossfade(true)
+                    }
+                    .build()
+            )
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .width(200.dp)
+                .height(200.dp)
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = "Loaded Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+        }
+    }
+}
+
 
 
 fun saveUserLoggedInState(context: Context, isLoggedIn: Boolean) {
@@ -307,6 +371,21 @@ fun isUserLoggedIn(context: Context): Boolean {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     return sharedPreferences.getBoolean("isLoggedIn", false)
 }
+
+fun saveVendorId(context: Context, userId: String)
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("userId", userId)
+    editor.apply()
+}
+
+fun getVendorId(context: Context): String?
+{
+    val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("userId", null)
+}
+
 
 fun saveUserType(context: Context, userType: String) {
     val sharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)

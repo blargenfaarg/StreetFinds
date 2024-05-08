@@ -2,6 +2,7 @@ package com.example.sprintone
 
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -53,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sprintone.ui.theme.SprintOneTheme
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -100,6 +104,7 @@ data class Truck(
     val saturdayHours : String,
     val sundayHours : String,
     val isFavorite: Boolean,
+    var distance: Float
     )
 
 
@@ -115,6 +120,9 @@ fun DisplayList() {
     val day = dateFormat.format(calendar.time)
     val context = LocalContext.current
     val selectedFavorite = remember { mutableStateOf(false) }
+    val selectedSort = remember { mutableStateOf(false)}
+    val selectedSort2 = remember { mutableStateOf(false)}
+    val camarillo = LatLng(34.2164, -119.0376)
 
    LaunchedEffect(key1 = Unit) {
         val db = Firebase.firestore
@@ -141,7 +149,7 @@ fun DisplayList() {
                         truckThursdayHours,
                         truckFridayHours,
                         truckSaturdayHours,
-                        truckSundayHours, isFavorite)
+                        truckSundayHours, isFavorite, distance = 0.0f)
                 } else {
                     null
                 }
@@ -177,6 +185,8 @@ fun DisplayList() {
             LazyRow(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth())
             {
+                item {  SortButton(truckListState, selectedSort)}
+                item {  SortByDistanceButton(truckListState, selectedSort2) }
                 item {  FilterButton("American", selectedTruckType)}
                 item {  FilterButton("Breakfast", selectedTruckType)}
                 item {  FilterButton("Mexican", selectedTruckType)}
@@ -184,13 +194,21 @@ fun DisplayList() {
                 item {  FilterButton("Asian", selectedTruckType)}
                 item {  FilterButton("Fusion", selectedTruckType)}
                 item {  FilterButton("Seafood", selectedTruckType)}
-                item {  FavoriteFilterButton(selectedFavorite)}
-
             }
             truckListState.value.filter { truck ->
                 (selectedTruckType.value == null || truck.type == selectedTruckType.value)
             }.forEach { truck ->
                 val randomNumber = (50..360).random()
+
+                val geocode = Geocoder(context, Locale.getDefault())
+                val addList = geocode.getFromLocationName(truck.location, 1)
+                if (!addList.isNullOrEmpty()) {
+                    val lat = addList[0].latitude
+                    val long = addList[0].longitude
+                    val truckLatLng = LatLng(lat, long)
+                    truck.distance = calculateDistance(camarillo, truckLatLng)
+                }
+
                 Card(modifier = Modifier
                     .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 5.dp)
                     .align(Alignment.CenterHorizontally),
@@ -202,7 +220,7 @@ fun DisplayList() {
                         intent.putExtra("location", truck.location)
                         intent.putExtra("colorVal", randomNumber)
                         context.startActivity(intent)
-                    })
+                    }, colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)))
                 {
                     Row(modifier = Modifier.fillMaxWidth()){
                         OutlinedCard(
@@ -247,15 +265,17 @@ fun DisplayList() {
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-
-                                when(day){
-                                    "Monday" -> GenerateDayText("Monday", truck.mondayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours, modifier = Modifier)
-                                    "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Friday" -> GenerateDayText("Friday", truck.fridayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours, modifier = Modifier.align(Alignment.CenterVertically))
-                                    "Sunday" -> GenerateDayText("Sunday", truck.sundayHours, modifier = Modifier.align(Alignment.CenterVertically))
+                                Box()
+                                {
+                                    when(day){
+                                        "Monday" -> GenerateDayText("Monday", truck.mondayHours)
+                                        "Tuesday" -> GenerateDayText("Tuesday", truck.tuesdayHours)
+                                        "Wednesday" -> GenerateDayText("Wednesday", truck.wednesdayHours)
+                                        "Thursday" -> GenerateDayText("Thursday", truck.thursdayHours)
+                                        "Friday" -> GenerateDayText("Friday", truck.fridayHours)
+                                        "Saturday" -> GenerateDayText("Saturday", truck.saturdayHours)
+                                        "Sunday" -> GenerateDayText("Sunday", truck.sundayHours)
+                                    }
                                 }
                             }
                         }
@@ -268,25 +288,21 @@ fun DisplayList() {
 }
 
 @Composable
-fun GenerateDayText(day: String, hours: String, modifier: Modifier)
+fun GenerateDayText(day: String, hours: String)
 {
-    Card(modifier = Modifier.fillMaxWidth())
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)))
     {
-        Row(modifier = Modifier.padding(start=4.dp))
-        {
-            Column() {
-                Text(
-                    modifier = modifier,
-                    text = "$day Hours:",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = hours,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    )
+        Column(modifier= Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
+            Text(
+                text = "$day Hours:",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(text = hours,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black)
             }
-        }
     }
 }
 
@@ -336,7 +352,69 @@ fun FavoriteFilterButton(selectedFavorite: MutableState<Boolean>) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SortButton(truckListState: MutableState<List<Truck>>, selectedSort : MutableState<Boolean>)
+{
+    ElevatedFilterChip(
+        onClick = {
+            if (!selectedSort.value)
+                {
+                    val sortedTrucks = truckListState.value.sortedBy { it.name }
+                    truckListState.value = sortedTrucks
+                    selectedSort.value = !selectedSort.value
+                }
+            else{
+                truckListState.value = truckListState.value.shuffled()
+                selectedSort.value = !selectedSort.value
+            }
+        },
+        leadingIcon = {
+            if (selectedSort.value) {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        },
+        modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+        colors = FilterChipDefaults.elevatedFilterChipColors(),
+        label = {Text("Sort by Name", color = Color.Black)},
+        selected = selectedSort.value
+    )
+}
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SortByDistanceButton(truckListState: MutableState<List<Truck>>, selectedSort2: MutableState<Boolean>)
+{
+    ElevatedFilterChip(
+        onClick = {
+            if (!selectedSort2.value)
+            {
+                val sortedTrucks = truckListState.value.sortedBy { it.distance }
+                truckListState.value = sortedTrucks
+                selectedSort2.value = !selectedSort2.value
+            }
+            else{
+                truckListState.value = truckListState.value.shuffled()
+                selectedSort2.value = !selectedSort2.value
+            }
+        },
+        leadingIcon = {
+            if (selectedSort2.value) {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        },
+        modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+        colors = FilterChipDefaults.elevatedFilterChipColors(),
+        label = {Text("Sort by Distance", color = Color.Black)},
+        selected = selectedSort2.value
+    )
+}
 

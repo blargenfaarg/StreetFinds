@@ -22,11 +22,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -76,8 +80,7 @@ class VendorForm : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LoadVendorForm()
-{
+fun LoadVendorForm() {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val email = getUserEmail(context)
@@ -90,7 +93,7 @@ fun LoadVendorForm()
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     var isPhoneValid by remember { mutableStateOf(true) }
-    var selectedText by remember { mutableStateOf("Type")}
+    var selectedText by remember { mutableStateOf("Type") }
 
     val truckMondayHours = remember { mutableStateOf("Closed") }
     val truckTuesdayHours = remember { mutableStateOf("Closed") }
@@ -100,181 +103,173 @@ fun LoadVendorForm()
     val truckSaturdayHours = remember { mutableStateOf("Closed") }
     val truckSundayHours = remember { mutableStateOf("Closed") }
 
-    val showHoursDialog = remember { mutableStateOf(false)}
-    val hasVendorEnteredHours = remember { mutableStateOf(false)}
-    var expanded by remember { mutableStateOf(false)}
+    val showHoursDialog = remember { mutableStateOf(false) }
+    val hasVendorEnteredHours = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
     val db = Firebase.firestore
     val coroutineScope = rememberCoroutineScope()
     val phoneNumberRegex = Regex("\\(\\d{3}\\)\\s\\d{3}-\\d{4}|\\d{10}")
 
-  val truckHours = remember { mutableStateOf(mapOf(
-      "Monday" to mutableStateOf(Pair("", "")),
-      "Tuesday" to mutableStateOf(Pair("", "")),
-      "Wednesday" to mutableStateOf(Pair("", "")),
-      "Thursday" to mutableStateOf(Pair("", "")),
-      "Friday" to mutableStateOf(Pair("", "")),
-      "Saturday" to mutableStateOf(Pair("", "")),
-      "Sunday" to mutableStateOf(Pair("", ""))
-      ))}
+    val truckHours = remember {
+        mutableStateOf(
+            mapOf(
+                "Monday" to mutableStateOf(Pair("", "")),
+                "Tuesday" to mutableStateOf(Pair("", "")),
+                "Wednesday" to mutableStateOf(Pair("", "")),
+                "Thursday" to mutableStateOf(Pair("", "")),
+                "Friday" to mutableStateOf(Pair("", "")),
+                "Saturday" to mutableStateOf(Pair("", "")),
+                "Sunday" to mutableStateOf(Pair("", ""))
+            )
+        )
+    }
 
-    Surface(color = Color.White, modifier = Modifier.fillMaxSize())
-    {
+    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .padding(20.dp)
-
+            modifier = Modifier.verticalScroll(scrollState)
         ) {
-            Text(
-                text = "Vendor Form",
-                modifier = Modifier.padding(top = 4.dp),
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp
-            )
-            Text(
-                text = "Please enter your business information below."
-            )
-            OutlinedTextField(
-                value = truckName,
-                onValueChange = { truckName = it },
-                label = { Text("Vendor Name") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-            OutlinedTextField(
-                value = truckPhoneNumber,
-                onValueChange = {
-                    truckPhoneNumber = it
-                    isPhoneValid = phoneNumberRegex.matches(it)
-                                },
-                label = {Text("Business Phone Number") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-                    .align(Alignment.CenterHorizontally),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-            )
-            if (!isPhoneValid)
-            {
+            Card(colors = CardDefaults.cardColors(Color.hsl(225f, 0.6f, 0.9f)),
+                modifier = Modifier.padding(20.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
+                {
+                    Text(
+                        text = "Vendor Form",
+                        modifier = Modifier.padding(top = 4.dp),
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 30.sp
+                    )
+                }
+
                 Text(
-                    text = "Please enter a valid phone number (e.g. (123) 456-7890)",
-                    color = Color.Red,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                    text = "Please enter your business information below.",
+                    modifier = Modifier.padding(16.dp)
                 )
-            }
-            OutlinedTextField(
-                value = truckDescription,
-                onValueChange = { truckDescription = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .padding(4.dp))
-            ExposedDropdownMenuBox(expanded = expanded,
-                onExpandedChange = {expanded = !expanded},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp))
-            {
-                OutlinedTextField(value = selectedText, onValueChange = {}, readOnly = true, modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth())
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = {expanded = false }) {
-                    DropdownMenuItem(text = {Text("American")},
-                        onClick = {
+                OutlinedTextField(
+                    value = truckName,
+                    onValueChange = { truckName = it },
+                    label = { Text("Vendor Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+                OutlinedTextField(
+                    value = truckPhoneNumber,
+                    onValueChange = {
+                        truckPhoneNumber = it
+                        isPhoneValid = phoneNumberRegex.matches(it)
+                    },
+                    label = { Text("Business Phone Number") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .align(Alignment.CenterHorizontally),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                )
+                if (!isPhoneValid) {
+                    Text(
+                        text = "Please enter a valid phone number (e.g. (123) 456-7890)",
+                        color = Color.Red,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                    )
+                }
+                OutlinedTextField(
+                    value = truckDescription,
+                    onValueChange = { truckDescription = it },
+                    label = { Text("Description") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                {
+                    OutlinedTextField(
+                        value = selectedText,
+                        onValueChange = {},
+                        readOnly = true,
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
+                    ExposedDropdownMenu(expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(text = { Text("American") }, onClick = {
                             truckType = "American"
                             selectedText = truckType
                             expanded = false
-                    })
-                    DropdownMenuItem(text = {Text("Mexican")},
-                        onClick = {
+                        })
+                        DropdownMenuItem(text = { Text("Mexican") }, onClick = {
                             truckType = "Mexican"
                             selectedText = truckType
                             expanded = false
                         })
-                    DropdownMenuItem(text = {Text("Fusion")},
-                        onClick = {
+                        DropdownMenuItem(text = { Text("Fusion") }, onClick = {
                             truckType = "Fusion"
                             selectedText = truckType
                             expanded = false
                         })
-                    DropdownMenuItem(text = {Text("Asian")},
-                        onClick = {
+                        DropdownMenuItem(text = { Text("Asian") }, onClick = {
                             truckType = "Asian"
                             selectedText = truckType
                             expanded = false
                         })
-                    DropdownMenuItem(text = {Text("Seafood")},
-                        onClick = {
+                        DropdownMenuItem(text = { Text("Seafood") }, onClick = {
                             truckType = "Seafood"
                             selectedText = truckType
                             expanded = false
                         })
-                    DropdownMenuItem(text = {Text("Breakfast")},
-                        onClick = {
+                        DropdownMenuItem(text = { Text("Breakfast") }, onClick = {
                             truckType = "Breakfast"
                             selectedText = truckType
                             expanded = false
                         })
-                    DropdownMenuItem(text = {Text("Italian")},
-                        onClick = {
+                        DropdownMenuItem(text = { Text("Italian") }, onClick = {
                             truckType = "Italian"
                             selectedText = truckType
                             expanded = false
                         })
-                }
-            }
-            OutlinedTextField(
-                value = truckLocation,
-                onValueChange = { truckLocation = it },
-                label = { Text("Address") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            )
-            Text(
-                text = "Business Hours",
-                modifier = Modifier.padding(top = 16.dp),
-                fontWeight = FontWeight.Bold
-            )
-            Button(onClick = {showHoursDialog.value = true})
-            {
-                Text("Input Business Hours")
-            }
-            if (showHoursDialog.value)
-            {
-                val updateHours = { day: String, hours: String ->
-                    when (day) {
-                        "Monday" -> truckMondayHours.value = hours
-                        "Tuesday" -> truckTuesdayHours.value = hours
-                        "Wednesday" -> truckWednesdayHours.value = hours
-                        "Thursday" -> truckThursdayHours.value = hours
-                        "Friday" -> truckFridayHours.value = hours
-                        "Saturday" -> truckSaturdayHours.value = hours
-                        "Sunday" -> truckSundayHours.value = hours
                     }
                 }
-                AlertDialog(onDismissRequest = {
-                    truckMondayHours.value = "Closed"
-                    truckTuesdayHours.value = "Closed"
-                    truckWednesdayHours.value = "Closed"
-                    truckThursdayHours.value = "Closed"
-                    truckFridayHours.value = "Closed"
-                    truckSaturdayHours.value = "Closed"
-                    truckSundayHours.value = "Closed"
-                    showHoursDialog.value = false
-                                               },
-                    confirmButton = { Button(onClick =
-                    {
-                        showHoursDialog.value = false
-                        hasVendorEnteredHours.value = true
-                    })
-                    {Text("Add Hours")} },
-                    dismissButton = {Button(onClick = {
+                OutlinedTextField(
+                    value = truckLocation,
+                    onValueChange = { truckLocation = it },
+                    label = { Text("Address") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Center)
+                {
+                    OutlinedButton(onClick = { showHoursDialog.value = true }
+                        , modifier = Modifier.fillMaxWidth()) {
+                        Text("Input Business Hours")
+                    }
+                }
+
+                if (showHoursDialog.value) {
+                    val updateHours = { day: String, hours: String ->
+                        when (day) {
+                            "Monday" -> truckMondayHours.value = hours
+                            "Tuesday" -> truckTuesdayHours.value = hours
+                            "Wednesday" -> truckWednesdayHours.value = hours
+                            "Thursday" -> truckThursdayHours.value = hours
+                            "Friday" -> truckFridayHours.value = hours
+                            "Saturday" -> truckSaturdayHours.value = hours
+                            "Sunday" -> truckSundayHours.value = hours
+                        }
+                    }
+                    AlertDialog(onDismissRequest = {
                         truckMondayHours.value = "Closed"
                         truckTuesdayHours.value = "Closed"
                         truckWednesdayHours.value = "Closed"
@@ -283,97 +278,127 @@ fun LoadVendorForm()
                         truckSaturdayHours.value = "Closed"
                         truckSundayHours.value = "Closed"
                         showHoursDialog.value = false
+                    }, confirmButton = {
+                        Button(onClick = {
+                            showHoursDialog.value = false
+                            hasVendorEnteredHours.value = true
+                        }) { Text("Add Hours") }
+                    }, dismissButton = {
+                        Button(onClick = {
+                            truckMondayHours.value = "Closed"
+                            truckTuesdayHours.value = "Closed"
+                            truckWednesdayHours.value = "Closed"
+                            truckThursdayHours.value = "Closed"
+                            truckFridayHours.value = "Closed"
+                            truckSaturdayHours.value = "Closed"
+                            truckSundayHours.value = "Closed"
+                            showHoursDialog.value = false
 
-                    }){Text("Cancel")} },
-                    text = {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally){
-                            Row()
-                            {
-                                Text("Opening Hours", modifier = Modifier.padding(end = 8.dp), fontWeight = FontWeight.Bold)
-                                Text("Closing Hours", modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
+                        }) { Text("Cancel") }
+                    }, text = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Row() {
+                                Text(
+                                    "Opening Hours",
+                                    modifier = Modifier.padding(end = 8.dp),
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "Closing Hours",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                            WeeklyBusinessHours(truckHours = truckHours, updateHours) } } )
-            }
-            Button(
-                onClick = {
-                    val truck = hashMapOf(
-                        "Name" to truckName,
-                        "Phone" to truckPhoneNumber,
-                        "Type" to truckType,
-                        "Location" to truckLocation,
-                        "Description" to truckDescription,
-                        "Monday Hours" to truckMondayHours.value,
-                        "Tuesday Hours" to truckTuesdayHours.value,
-                        "Wednesday Hours" to truckWednesdayHours.value,
-                        "Thursday Hours" to truckThursdayHours.value,
-                        "Friday Hours" to truckFridayHours.value,
-                        "Saturday Hours" to truckSaturdayHours.value,
-                        "Sunday Hours" to truckSundayHours.value,
+                            WeeklyBusinessHours(truckHours = truckHours, updateHours)
+                        }
+                    })
+                }
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    , horizontalArrangement = Arrangement.Center)
+                {
+                    Button(onClick = {
+                        val truck = hashMapOf(
+                            "Name" to truckName,
+                            "Phone" to truckPhoneNumber,
+                            "Type" to truckType,
+                            "Location" to truckLocation,
+                            "Description" to truckDescription,
+                            "Monday Hours" to truckMondayHours.value,
+                            "Tuesday Hours" to truckTuesdayHours.value,
+                            "Wednesday Hours" to truckWednesdayHours.value,
+                            "Thursday Hours" to truckThursdayHours.value,
+                            "Friday Hours" to truckFridayHours.value,
+                            "Saturday Hours" to truckSaturdayHours.value,
+                            "Sunday Hours" to truckSundayHours.value,
+                        )
+                        db.collection("trucks").whereEqualTo("Name", truckName).get()
+                            .addOnSuccessListener { documents ->
+                                if (documents.isEmpty) {
+                                    db.collection("trucks").add(truck)
+                                    successMessage = "Success! Your listing has been added."
+                                    coroutineScope.launch {
+                                        delay(5000)
+                                        successMessage = null
+                                        context.startActivity(
+                                            Intent(
+                                                context, ListActivity::class.java
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    errorMessage =
+                                        "This vendor already exists. Please choose a different name."
+                                    coroutineScope.launch {
+                                        delay(5000)
+                                        errorMessage = null
+                                    }
+                                }
+                            }
+
+                        db.collection("vendors").whereEqualTo("Email", email).get()
+                            .addOnSuccessListener { documents ->
+                                if (!documents.isEmpty) {
+                                    val vendorDoc = documents.documents.first()
+                                    val vendorId = vendorDoc.id
+                                    db.collection("vendors").document(vendorId)
+                                        .update("Business Name", truckName)
+                                }
+                            }
+
+                    }, enabled = truckName.isNotBlank()
+                            && truckDescription.isNotBlank()
+                            && truckType.isNotBlank()
+                            && truckLocation.isNotBlank()
+                            && hasVendorEnteredHours.value, modifier = Modifier.fillMaxWidth()
+                    ) { Text("Add Truck") }
+                }
+
+                errorMessage?.let {
+                    Text(
+                        text = it, color = Color.Red, modifier = Modifier.padding(16.dp)
                     )
-                    db.collection("trucks").whereEqualTo("Name", truckName)
-                        .get()
-                        .addOnSuccessListener {documents ->
-                            if(documents.isEmpty)
-                            {
-                                db.collection("trucks").add(truck)
-                                successMessage = "Success! Your listing has been added."
-                                coroutineScope.launch {
-                                    delay(5000)
-                                    successMessage = null
-                                    context.startActivity(Intent(context, ListActivity::class.java))
-                                }
-                            }
-                            else{
-                                errorMessage = "This vendor already exists. Please choose a different name."
-                                coroutineScope.launch {
-                                    delay(5000)
-                                    errorMessage = null
-                                }
-                            }
-                        }
-
-                    db.collection("vendors").whereEqualTo("Email", email)
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            if (!documents.isEmpty) {
-                                val vendorDoc = documents.documents.first()
-                                val vendorId = vendorDoc.id
-                                db.collection("vendors").document(vendorId).update("Business Name", truckName)
-                            }
-                        }
-                },
-                enabled = truckName.isNotBlank()
-                        && truckDescription.isNotBlank()
-                        && truckType.isNotBlank()
-                        && truckLocation.isNotBlank()
-                        && hasVendorEnteredHours.value
-            ) {
-                Text("Add Truck")
-            }
-            errorMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            successMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Green,
-                    modifier = Modifier.padding(16.dp)
-                )
+                }
+                successMessage?.let {
+                    Text(
+                        text = it, color = Color.Green, modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun WeeklyBusinessHours(truckHours: MutableState<Map<String, MutableState<Pair<String, String>>>>,
-                        onUpdateHours:(String, String) -> Unit) {
-    val formattedHoursMap = remember { mutableStateMapOf<String, String>()}
+fun WeeklyBusinessHours(
+    truckHours: MutableState<Map<String, MutableState<Pair<String, String>>>>,
+    onUpdateHours: (String, String) -> Unit
+) {
+    val formattedHoursMap = remember { mutableStateMapOf<String, String>() }
     Column {
-        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").forEach { day ->
+        listOf(
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+        ).forEach { day ->
             val dayHours = truckHours.value[day]!!
             val openingHours = remember { mutableStateOf(dayHours.value.first) }
             val closingHours = remember { mutableStateOf(dayHours.value.second) }
@@ -388,18 +413,17 @@ fun WeeklyBusinessHours(truckHours: MutableState<Map<String, MutableState<Pair<S
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayTimePicker(day: String,
-                  openingHours: MutableState<String>,
-                  closingHours: MutableState<String>,
-                  onHoursFormatted: (String) -> Unit
-                  )
-{
-    var formattedHours by remember { mutableStateOf("")}
-        Row(modifier = Modifier.fillMaxWidth())
-        {
-            TimeInputField(day, "Opening", openingHours)
-            TimeInputField(day, "Closing", closingHours)
-        }
+fun DayTimePicker(
+    day: String,
+    openingHours: MutableState<String>,
+    closingHours: MutableState<String>,
+    onHoursFormatted: (String) -> Unit
+) {
+    var formattedHours by remember { mutableStateOf("") }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        TimeInputField(day, "Opening", openingHours)
+        TimeInputField(day, "Closing", closingHours)
+    }
 
 
     LaunchedEffect(openingHours.value, closingHours.value) {
@@ -412,11 +436,10 @@ fun DayTimePicker(day: String,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeInputField(day: String, label: String, timeState: MutableState<String>)
-{
-    val showDialog = remember { mutableStateOf(false)}
+fun TimeInputField(day: String, label: String, timeState: MutableState<String>) {
+    val showDialog = remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
-    val isEnabled = remember { mutableStateOf(false)}
+    val isEnabled = remember { mutableStateOf(false) }
 
     Box(modifier = Modifier
         .width(135.dp)
@@ -432,19 +455,15 @@ fun TimeInputField(day: String, label: String, timeState: MutableState<String>)
             enabled = isEnabled.value,
             label = {
                 Text(text = "$day $label", color = Color.Gray, fontSize = 14.sp, lineHeight = 12.sp)
-                    },
+            },
             modifier = Modifier.fillMaxSize()
         )
     }
 
-    if (showDialog.value)
-    {
+    if (showDialog.value) {
         TimePickerDialog(
-            title = "Select $label Time",
-            timePickerState = timePickerState,
-            showDialog = showDialog)
-        {
-            selectedTime ->
+            title = "Select $label Time", timePickerState = timePickerState, showDialog = showDialog
+        ) { selectedTime ->
             timeState.value = selectedTime
         }
     }
@@ -458,28 +477,21 @@ fun TimePickerDialog(
     showDialog: MutableState<Boolean>,
     onTimeSelected: (String) -> Unit
 ) {
-    if (showDialog.value)
-    {
-        AlertDialog(
-            onDismissRequest = {},
-            title = { Text(title) },
-            confirmButton = {
-                Button(onClick = {
+    if (showDialog.value) {
+        AlertDialog(onDismissRequest = {}, title = { Text(title) }, confirmButton = {
+            Button(onClick = {
                 showDialog.value = false
-                }) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {showDialog.value=false}) {
-                    Text("Cancel")
-                }
-            },
-            text = {
-                TimePicker(state = timePickerState, layoutType = TimePickerLayoutType.Vertical)
-                onTimeSelected(convertHours(timePickerState.hour, timePickerState.minute))
+            }) {
+                Text("Confirm")
             }
-        )
+        }, dismissButton = {
+            Button(onClick = { showDialog.value = false }) {
+                Text("Cancel")
+            }
+        }, text = {
+            TimePicker(state = timePickerState, layoutType = TimePickerLayoutType.Vertical)
+            onTimeSelected(convertHours(timePickerState.hour, timePickerState.minute))
+        })
     }
 }
 

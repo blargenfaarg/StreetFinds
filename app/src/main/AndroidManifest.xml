@@ -13,11 +13,13 @@
         android:theme="@style/Theme.AppCompat"
         tools:targetApi="31">
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".UserLogIn"
             android:exported="false"
             android:label="@string/title_activity_log_in"
             android:theme="@style/Theme.AppCompat" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".VendorSignUp"
             android:exported="false"
             android:label="@string/title_activity_vendor_login"
@@ -29,6 +31,7 @@
             android:theme="@style/Theme.AppCompat" />
 
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".UserSignUp"
             android:exported="false"
             android:label="@string/title_activity_login"
@@ -46,10 +49,12 @@
             android:exported="false"
             android:label="Vendor Profile" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".VendorForm"
             android:exported="false"
             android:label="Vendor Form" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".VendorLogIn"
             android:exported="false"
             android:label="@string/title_activity_log_in"
