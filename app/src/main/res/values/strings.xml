@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sprint One</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_vendor_page">VendorPage</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_user_page">UserPage</string>
+    <string name="title_activity_maps_compose">MapsCompose</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_vendor_login">VendorLoginActivity</string>
+    <string name="title_activity_log_in">LogIn</string>
+</resources>

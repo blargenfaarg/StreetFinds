@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/icon_streetfinds"
+        android:label="StreetFinds"
+        android:roundIcon="@mipmap/icon_streetfinds_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat"
+        tools:targetApi="31">
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".UserLogIn"
+            android:exported="false"
+            android:label="@string/title_activity_log_in"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".VendorSignUp"
+            android:exported="false"
+            android:label="@string/title_activity_vendor_login"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".VendorProfilePage"
+            android:exported="false"
+            android:label="VendorProfilePage"
+            android:theme="@style/Theme.AppCompat" />
+
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".UserSignUp"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.AppCompat" />
+        <activity
+            android:name=".MapsComposeActivity"
+            android:exported="false"
+            android:label="StreetFinds Map" />
+        <activity
+            android:name=".UserPage"
+            android:exported="false"
+            android:label="@string/title_activity_user_page" />
+        <activity
+            android:name=".VendorPage"
+            android:exported="false"
+            android:label="Vendor Profile" />
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".VendorForm"
+            android:exported="false"
+            android:label="Vendor Form" />
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".VendorLogIn"
+            android:exported="false"
+            android:label="@string/title_activity_log_in"
+            android:theme="@style/Theme.AppCompat" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+        <activity
+            android:name=".ListActivity"
+            android:exported="false"
+            android:label="Vendor List" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
